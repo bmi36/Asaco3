@@ -39,9 +39,14 @@ class Calendar : Fragment() {
                     intent.putExtra("year", year)
                     intent.putExtra("month", month)
                     intent.putExtra("day", dayOfMonth)
+                    startActivity(intent)
+                    return@setOnDateChangeListener
                 }
             }
-            startActivity(intent)
+
+            val nullIntent = Intent(activity, MemoNullActivity::class.java)
+            startActivity(nullIntent)
+
         }
     }
 
