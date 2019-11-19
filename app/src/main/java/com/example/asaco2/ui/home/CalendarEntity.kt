@@ -1,4 +1,4 @@
-package com.example.myapplication
+package com.example.asaco2.ui.home
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity

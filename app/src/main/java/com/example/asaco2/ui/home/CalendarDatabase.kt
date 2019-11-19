@@ -1,4 +1,4 @@
-package com.example.myapplication
+package com.example.asaco2.ui.home
 
 import android.content.Context
 import androidx.room.Database
@@ -14,9 +14,9 @@ import androidx.room.RoomDatabase
         @Volatile
         private var instance: CalendarDatabase? = null
 
-        fun getInstance(context: Context): CalendarDatabase = instance?:
+        fun getInstance(context: Context): CalendarDatabase = instance ?:
                 synchronized(this){
-                    Room.databaseBuilder(context,CalendarDatabase::class.java,"calendar_db").build()
+                    Room.databaseBuilder(context, CalendarDatabase::class.java,"calendar_db").build()
                 }
     }
 }

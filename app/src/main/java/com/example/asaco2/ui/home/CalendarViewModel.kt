@@ -4,9 +4,6 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.viewModelScope
-import com.example.asacojoin.Repository
-import com.example.myapplication.CalendarDatabase
-import com.example.myapplication.CalendarEntity
 import kotlinx.coroutines.launch
 import java.sql.SQLException
 
