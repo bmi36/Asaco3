@@ -1,5 +1,6 @@
 package com.example.asaco2
 
+import android.content.Intent
 import android.graphics.Bitmap
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
@@ -16,9 +17,14 @@ class CameraActivity : AppCompatActivity() {
         try {
             val bmp = intent?.extras?.get("data") as Bitmap
             cameraImag.setImageBitmap(bmp)
-            PostBmpAsyncHttpRequest(this).execute(Param(HTTP, bmp))
+            PostBmpAsyncHttpRequest(setResult()).execute(Param(HTTP, bmp))
         } catch (e: IOException) {
             e.printStackTrace()
         }
+    }
+
+    private fun setResult() {
+        val intent = Intent(this, CameraResultActivity::class.java)
+        startActivity(intent)
     }
 }

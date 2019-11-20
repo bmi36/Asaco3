@@ -1,14 +1,15 @@
 package com.example.asaco2
 
-import android.app.Activity
 import android.graphics.Bitmap
 import android.os.AsyncTask
 import java.io.*
 import java.net.HttpURLConnection
 import java.net.URL
 
-class PostBmpAsyncHttpRequest(activity: Activity) :
-    AsyncTask<Param, Unit, String>() {
+class PostBmpAsyncHttpRequest(
+    private val resultMethod: Unit
+) : AsyncTask<Param, Unit, String>() {
+
 
 
     override fun doInBackground(vararg params: Param?): String {
@@ -62,7 +63,7 @@ class PostBmpAsyncHttpRequest(activity: Activity) :
     }
 
     override fun onPostExecute(result: String?) {
-        TODO()
+        resultMethod
     }
 
 }
