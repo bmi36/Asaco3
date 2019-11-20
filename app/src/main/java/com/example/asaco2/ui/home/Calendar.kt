@@ -31,22 +31,26 @@ class Calendar : Fragment() {
         })
 
         calendarView.setOnDateChangeListener { _, year, month, dayOfMonth ->
-            val intent = Intent(activity, Memo::class.java)
+            var frg: Boolean? = false
+            val intent by lazy {
+                when (frg) {
+                    true -> Intent(activity, Memo::class.java)
+                    else -> Intent(activity, MemoNullActivity::class.java)
+                }
+            }
             val id = year.toLong() + month.toLong() + dayOfMonth.toLong()
             for (element in list) {
                 if (element.id == id) {
+                    frg = true
                     intent.putExtra("calendar", element)
                     intent.putExtra("year", year)
                     intent.putExtra("month", month)
                     intent.putExtra("day", dayOfMonth)
-                    startActivity(intent)
-                    return@setOnDateChangeListener
+                    break
                 }
             }
-
-            val nullIntent = Intent(activity, MemoNullActivity::class.java)
-            startActivity(nullIntent)
-
+            intent
+            startActivity(intent)
         }
     }
 

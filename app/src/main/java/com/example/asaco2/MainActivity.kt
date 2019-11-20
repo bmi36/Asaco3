@@ -1,7 +1,6 @@
 package com.example.asaco2
 
 import android.Manifest
-import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
@@ -192,7 +191,6 @@ class MainActivity : AppCompatActivity() {
         return true
     }
 
-    @SuppressLint("SetTextI18n")
     private fun setHeader(navView: NavigationView) {
         val data = getSharedPreferences("User", Context.MODE_PRIVATE)
         val view = LayoutInflater.from(this).inflate(R.layout.nav_header_main, navView, false)
@@ -202,17 +200,5 @@ class MainActivity : AppCompatActivity() {
             "摂取⇒${data?.getInt("calory", 0)}\n燃焼⇒${data?.getInt("barn", 0)}\n"
         view.bmiText.text = "   BMI:${data?.getInt("bmi", 36)}"
 
-    }
-
-    private fun setPref() {
-        val prefs = getSharedPreferences("User", Context.MODE_PRIVATE)
-        val editor = prefs.edit()
-        editor.putString("name", HUNTER)
-        editor.commit()
-    }
-
-    private fun getPref() {
-        val prefs = getSharedPreferences("User", Context.MODE_PRIVATE)
-        prefs.getString("name", HUNTER)
     }
 }
