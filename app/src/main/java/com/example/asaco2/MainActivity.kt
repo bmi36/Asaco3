@@ -1,13 +1,18 @@
 package com.example.asaco2
 
 import android.Manifest
-import android.app.Activity
+import android.annotation.SuppressLint
+import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.net.Uri
 import android.os.Bundle
+import android.os.Environment
 import android.provider.MediaStore
+import android.util.Log
 import android.view.LayoutInflater
 import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
@@ -15,6 +20,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
@@ -27,20 +33,31 @@ import com.example.asaco2.ui.tools.ToolsFragment
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.navigation.NavigationView
 import kotlinx.android.synthetic.main.nav_header_main.view.*
+import java.io.File
+import java.text.SimpleDateFormat
+import java.util.*
 
 class MainActivity : AppCompatActivity() {
 
     companion object {
         const val CAMERA_REQUEST_CODE = 1
         const val CAMERA_PERMISSION_REQUEST_CODE = 2
+        const val FILE_PERMISSION_REQUEST_CODE = 3
         const val HUNTER = "HUNTER"
     }
 
     private lateinit var appBarConfiguration: AppBarConfiguration
-
+    //    private val fileFolder by lazy {
+//        getExternalFilesDir(
+//            Environment.DIRECTORY_DCIM
+//        )
+//    }
     private val prefs by lazy {
         getSharedPreferences("User", Context.MODE_PRIVATE)
     }
+    private lateinit var file: File
+    private lateinit var uri: Uri
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,7 +69,8 @@ class MainActivity : AppCompatActivity() {
         val fab: FloatingActionButton = findViewById(R.id.fab)
         fab.setOnClickListener {
             //カメラボタンが押されたときになんかするやつ
-            openIntent()
+//            openIntent()
+            checkPermission()
         }
 
         val drawerLayout: DrawerLayout = findViewById(R.id.drawer_layout)
@@ -84,7 +102,8 @@ class MainActivity : AppCompatActivity() {
         navView.setNavigationItemSelectedListener {
             when (it.itemId) {
                 R.id.nav_slideshow -> {
-                    openIntent()
+                    checkPermission()
+//                    openIntent()
                     true
                 }
 
@@ -101,7 +120,7 @@ class MainActivity : AppCompatActivity() {
 
                 R.id.nav_tools -> {
                     toolbar.title = "設定"
-                    action(ToolsFragment(navView,prefs))
+                    action(ToolsFragment(navView, prefs))
                 }
                 else -> action(null)
             }
@@ -117,7 +136,22 @@ class MainActivity : AppCompatActivity() {
 
 
     private fun takePicture() {
+        val folder = getExternalFilesDir(Environment.DIRECTORY_DCIM)
+
+        val fileName =
+            SimpleDateFormat("YYMMddhhmmss", Locale.US).format(Date()).let {
+                String.format("ComeraIntent_%s.jpg", it)
+            }
+
+
+        file = File(folder, fileName)
+
+        uri = FileProvider.getUriForFile(
+            this, applicationContext.packageName + ".fileprovider",
+            file
+        )
         val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE).apply {
+            putExtra(MediaStore.EXTRA_OUTPUT, uri)
             addCategory(Intent.CATEGORY_DEFAULT)
         }
 
@@ -153,18 +187,29 @@ class MainActivity : AppCompatActivity() {
             if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 takePicture()
             }
+        } else {
+            Toast.makeText(this, "うんこ💩💩💩", Toast.LENGTH_SHORT).show()
         }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == CAMERA_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
+        if (requestCode == CAMERA_REQUEST_CODE) {
+            //            val stream = FileInputStream(file)
+            registerDatabase(file)
+            val option = BitmapFactory.Options()
+            option.inSampleSize = 10
             data?.extras?.get("data").let {
+                //                val bitmap = BitmapFactory.decodeStream(
+//                    stream, null, option
+//                )
                 val bmp = it as Bitmap
                 val intent = Intent(this, CameraActivity::class.java)
                 intent.putExtra("data", bmp)
                 startActivity(intent)
             }
+        } else {
+            Log.d("debug", "うんこ💩💩💩")
         }
     }
 
@@ -191,14 +236,56 @@ class MainActivity : AppCompatActivity() {
         return true
     }
 
+    @SuppressLint("SetTextI18n")
     private fun setHeader(navView: NavigationView) {
         val data = getSharedPreferences("User", Context.MODE_PRIVATE)
         val view = LayoutInflater.from(this).inflate(R.layout.nav_header_main, navView, false)
         navView.addHeaderView(view)
         view.UserName.text = data.getString("name", HUNTER)
         view.Cal.text =
-            "摂取⇒${data?.getInt("calory", 0)}\n燃焼⇒${data?.getInt("barn", 0)}\n"
+            "摂取⇒${data?.getInt("calory", 0)}" +
+                    "\n燃焼⇒${data?.getInt("barn", 0)}"
+
         view.bmiText.text = "   BMI:${data?.getInt("bmi", 36)}"
 
     }
+
+
+    private fun registerDatabase(file: File) {
+        val contentValues: ContentValues = ContentValues().also {
+            it.put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
+            it.put("data", file.absolutePath)
+        }
+        this.contentResolver.also {
+            it.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
+        }
+    }
+
+    private fun requestFilePermission() {
+        val compat = {
+            val strarry: Array<String> =
+                arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+            ActivityCompat.requestPermissions(this, strarry, FILE_PERMISSION_REQUEST_CODE)
+        }
+
+        if (ActivityCompat.shouldShowRequestPermissionRationale(
+                this,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE
+            )
+        ) compat else {
+            Toast.makeText(this, "許可されないとアプリが実行できません", Toast.LENGTH_SHORT)
+                .show()
+            compat
+        }
+    }
+
+    private fun checkPermission() {
+        if (ActivityCompat.checkSelfPermission
+                (this, Manifest.permission.WRITE_EXTERNAL_STORAGE) ==
+            PackageManager.PERMISSION_GRANTED
+        )
+            openIntent() else requestFilePermission()
+    }
+
+
 }

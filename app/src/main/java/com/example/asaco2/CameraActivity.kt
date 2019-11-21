@@ -17,14 +17,15 @@ class CameraActivity : AppCompatActivity() {
         try {
             val bmp = intent?.extras?.get("data") as Bitmap
             cameraImag.setImageBitmap(bmp)
-            PostBmpAsyncHttpRequest(setResult()).execute(Param(HTTP, bmp))
+            PostBmpAsyncHttpRequest(setResult(bmp)).execute(Param(HTTP, bmp))
         } catch (e: IOException) {
             e.printStackTrace()
         }
     }
 
-    private fun setResult() {
+    private fun setResult(bmp: Bitmap) {
         val intent = Intent(this, CameraResultActivity::class.java)
+        intent.putExtra("data", bmp)
         startActivity(intent)
     }
 }
