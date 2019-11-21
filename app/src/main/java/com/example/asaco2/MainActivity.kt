@@ -47,6 +47,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private lateinit var appBarConfiguration: AppBarConfiguration
+
     //    private val fileFolder by lazy {
 //        getExternalFilesDir(
 //            Environment.DIRECTORY_DCIM
@@ -140,7 +141,7 @@ class MainActivity : AppCompatActivity() {
 
         val fileName =
             SimpleDateFormat("YYMMddhhmmss", Locale.US).format(Date()).let {
-                String.format("ComeraIntent_%s.jpg", it)
+                String.format("CameraIntent_%s.jpg", it)
             }
 
 
@@ -151,7 +152,7 @@ class MainActivity : AppCompatActivity() {
             file
         )
         val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE).apply {
-            putExtra(MediaStore.EXTRA_OUTPUT, uri)
+            //            putExtra(MediaStore.EXTRA_OUTPUT, uri)
             addCategory(Intent.CATEGORY_DEFAULT)
         }
 
@@ -166,15 +167,14 @@ class MainActivity : AppCompatActivity() {
 //    }
 
     private fun checkCameraPermission() =
-        PackageManager.PERMISSION_GRANTED == ContextCompat.checkSelfPermission(
-            applicationContext,
-            Manifest.permission.CAMERA
-        )
+        PackageManager.PERMISSION_GRANTED ==
+                ContextCompat.checkSelfPermission(
+                    applicationContext, Manifest.permission.CAMERA
+                )
 
     private fun grantCameraPermission() =
         ActivityCompat.requestPermissions(
-            this,
-            arrayOf(Manifest.permission.CAMERA),
+            this, arrayOf(Manifest.permission.CAMERA),
             CAMERA_PERMISSION_REQUEST_CODE
         )
 
@@ -263,9 +263,9 @@ class MainActivity : AppCompatActivity() {
 
     private fun requestFilePermission() {
         val compat = {
-            val strarry: Array<String> =
+            val strArray: Array<String> =
                 arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-            ActivityCompat.requestPermissions(this, strarry, FILE_PERMISSION_REQUEST_CODE)
+            ActivityCompat.requestPermissions(this, strArray, FILE_PERMISSION_REQUEST_CODE)
         }
 
         if (ActivityCompat.shouldShowRequestPermissionRationale(
