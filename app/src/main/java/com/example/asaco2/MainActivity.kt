@@ -242,8 +242,6 @@ class MainActivity : AppCompatActivity() {
                 navView.addHeaderView(this)
             }
         }
-
-
     }
 
 

@@ -7,7 +7,7 @@ import java.net.HttpURLConnection
 import java.net.URL
 
 class PostBmpAsyncHttpRequest(
-    private val resultMethod: Unit
+    private val intent: Unit
 ) : AsyncTask<Param, Unit, String>() {
 
 
@@ -63,7 +63,8 @@ class PostBmpAsyncHttpRequest(
     }
 
     override fun onPostExecute(result: String?) {
-        resultMethod
+        super.onPostExecute(result)
+        intent
     }
 
 }

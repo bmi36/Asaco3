@@ -5,27 +5,26 @@ import android.graphics.Bitmap
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_camera_activty.*
-import java.io.IOException
 
 const val HTTP = "http://192.168.3.7:8080/8180/python_server/.images/image"
+
 class CameraActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_camera_activty)
 
-        try {
-            val bmp = intent?.extras?.get("data") as Bitmap
-            cameraImag.setImageBitmap(bmp)
-            PostBmpAsyncHttpRequest(setResult(bmp)).execute(Param(HTTP, bmp))
-        } catch (e: IOException) {
-            e.printStackTrace()
-        }
+        val bmp = intent?.extras?.get("data") as Bitmap
+        cameraImag.setImageBitmap(bmp)
+
+        PostBmpAsyncHttpRequest(setIntent(bmp)).execute(Param(HTTP, bmp))
     }
 
-    private fun setResult(bmp: Bitmap) {
-        val intent = Intent(this, CameraResultActivity::class.java)
-        intent.putExtra("data", bmp)
-        startActivity(intent)
+    private fun setIntent(bmp: Bitmap) {
+        startActivity(
+            Intent(this, CameraResultActivity::class.java).apply {
+                intent.putExtra("data", bmp)
+            })
+
     }
 }
