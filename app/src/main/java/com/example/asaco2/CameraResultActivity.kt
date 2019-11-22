@@ -10,7 +10,6 @@ class CameraResultActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_camera_resulut)
-        val bitmap = intent.extras.get("data") as Bitmap
-        imageView.setImageBitmap(bitmap)
+        imageView.setImageBitmap(intent?.extras?.get("data") as Bitmap)
     }
 }
