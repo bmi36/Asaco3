@@ -1,6 +1,8 @@
 package com.example.asaco2
 
+import android.graphics.Bitmap
+
 data class Param(
-    val name: String,
-    val calory: String
+    val uri: String,
+    val bmp: Bitmap
 )

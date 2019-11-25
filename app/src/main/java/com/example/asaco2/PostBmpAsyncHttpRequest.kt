@@ -25,7 +25,7 @@ class PostBmpAsyncHttpRequest(
         try {
 
             val jpg = ByteArrayOutputStream()
-            param?.bmp.compress(Bitmap.CompressFormat.JPEG, 100, jpg)
+            param?.bmp?.compress(Bitmap.CompressFormat.JPEG, 100, jpg)
 
             connection.connectTimeout = 3000
             connection.readTimeout = 3000
