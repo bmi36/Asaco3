@@ -64,10 +64,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private val file: File by lazy {
-        SimpleDateFormat("YYMMddhhmmss", Locale.US).format(Date()).run {
-            String.format("CameraIntent_%s.jpg", this)
-            File(getExternalFilesDir(Environment.DIRECTORY_DCIM), this)
-        }
+
+        File(getExternalFilesDir(Environment.DIRECTORY_DCIM), setTime())
     }
 
 //    private val uri: Uri by lazy {
@@ -78,7 +76,33 @@ class MainActivity : AppCompatActivity() {
 //    }
 
     private val navView: NavigationView by lazy {
-        nav_view
+        nav_view.apply {
+            this.setNavigationItemSelectedListener {
+                when (it.itemId) {
+                    R.id.nav_slideshow -> {
+                        checkPermission()
+//                    openIntent()
+                        true
+                    }
+
+                    R.id.nav_calendar -> {
+                        toolbar.title = "カレンダー画面"
+                        action(Calendar())
+                    }
+
+                    R.id.nav_gallery -> {
+                        toolbar.title = "徒歩"
+                        action(GalleryFragment())
+                    }
+
+                    R.id.nav_tools -> {
+                        toolbar.title = "設定"
+                        action(ToolsFragment(navView, prefs))
+                    }
+                    else -> action(null)
+                }
+            }
+        }
     }
 
 
@@ -111,31 +135,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         //スライドメニューの各項目を押したとき
-        navView.setNavigationItemSelectedListener {
-            when (it.itemId) {
-                R.id.nav_slideshow -> {
-                    checkPermission()
-//                    openIntent()
-                    true
-                }
-
-                R.id.nav_calendar -> {
-                    toolbar.title = "カレンダー画面"
-                    action(Calendar())
-                }
-
-                R.id.nav_gallery -> {
-                    toolbar.title = "徒歩"
-                    action(GalleryFragment())
-                }
-
-                R.id.nav_tools -> {
-                    toolbar.title = "設定"
-                    action(ToolsFragment(navView, prefs))
-                }
-                else -> action(null)
-            }
-        }
+        navView
         setFragment = Calendar()
         setHeader(navView)
     }
@@ -291,3 +291,8 @@ class MainActivity : AppCompatActivity() {
         }
     }
 }
+
+fun setTime() =
+    SimpleDateFormat("YYMMddhhmmss", Locale.US).format(Date()).run {
+        String.format("CameraIntent_%s.jpg", this)
+    }

@@ -23,16 +23,11 @@ class ToolsFragment(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-
-        val view = inflater.inflate(R.layout.fragment_tools, container, false)
-        val str = prefs.getString("name", "HUNTER")
-        val wight = prefs.getInt("wight", 0)
-        val high = prefs.getInt("height", 0)
-        view.userName.setText(str, TextView.BufferType.NORMAL)
-        view.wight.setText(wight.toString(), TextView.BufferType.NORMAL)
-        view.high.setText(high.toString(), TextView.BufferType.NORMAL)
-        return view
+    ): View? =
+        inflater.inflate(R.layout.fragment_tools, container, false).also {
+            it.userName.setText(prefs.getString("name", "HUNTER"), TextView.BufferType.NORMAL)
+            it.wight.setText(prefs.getInt("wight", 0).toString(), TextView.BufferType.NORMAL)
+            it.high.setText(prefs.getInt("height", 0).toString(), TextView.BufferType.NORMAL)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -43,11 +38,11 @@ class ToolsFragment(
             val str = userName.text.toString()
             val wint = high.text.toString().toInt()
             val hint = wight.text.toString().toInt()
-            val bmi = if (wint == 0 || hint == 0){
-                 0
-            }else{
-                 val tmp = (hint*hint)/10
-                wint*1000/tmp
+            val bmi = if (wint == 0 || hint == 0) {
+                0
+            } else {
+                val tmp = (hint * hint) / 10
+                wint * 1000 / tmp
             }
 
             editor.putString("name", str)

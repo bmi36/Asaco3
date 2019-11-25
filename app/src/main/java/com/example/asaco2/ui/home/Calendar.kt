@@ -14,7 +14,10 @@ import kotlinx.android.synthetic.main.fragment_home.*
 
 class Calendar : Fragment() {
 
-    private lateinit var viewModel: CalendarViewModel
+    private val viewModel: CalendarViewModel by lazy {
+        ViewModelProviders.of(this).get(CalendarViewModel::class.java)
+    }
+
     private lateinit var list: Array<CalendarEntity>
 
     override fun onCreateView(
@@ -26,37 +29,31 @@ class Calendar : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        viewModel.allCalendar.observe(this, Observer {
-            if (it != null) list = it
-        })
+
 
         calendarView.setOnDateChangeListener { _, year, month, dayOfMonth ->
-            var frg: Boolean? = false
-            val intent by lazy {
-                when (frg) {
-                    true -> Intent(activity, Memo::class.java)
-                    else -> Intent(activity, MemoNullActivity::class.java)
-                }
-            }
+            var intent = Intent(activity, MemoNullActivity::class.java)
             val id = year.toLong() + month.toLong() + dayOfMonth.toLong()
             for (element in list) {
                 if (element.id == id) {
-                    frg = true
-                    intent.putExtra("calendar", element)
-                    intent.putExtra("year", year)
-                    intent.putExtra("month", month)
-                    intent.putExtra("day", dayOfMonth)
+                    intent = Intent(activity, Memo::class.java).apply {
+                        this.putExtra("calendar", element)
+                        this.putExtra("year", year)
+                        this.putExtra("month", month)
+                        this.putExtra("day", dayOfMonth)
+                    }
                     break
                 }
             }
-            intent
             startActivity(intent)
         }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        viewModel = ViewModelProviders.of(this).get(CalendarViewModel::class.java)
+        viewModel.allCalendar.observe(this, Observer {
+            if (it != null) list = it
+        })
     }
 }
+

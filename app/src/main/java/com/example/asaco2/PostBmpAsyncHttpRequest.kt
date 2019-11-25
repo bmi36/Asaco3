@@ -25,12 +25,11 @@ class PostBmpAsyncHttpRequest(
         try {
 
             val jpg = ByteArrayOutputStream()
-            param?.bmp?.compress(Bitmap.CompressFormat.JPEG, 100, jpg)
+            param?.bmp.compress(Bitmap.CompressFormat.JPEG, 100, jpg)
 
             connection.connectTimeout = 3000
             connection.readTimeout = 3000
             connection.requestMethod = "POST"
-
             connection.setRequestProperty("User-Agent", "Android")
             connection.setRequestProperty("Content-type", "application/octet-stream")
             connection.doOutput = true
@@ -38,9 +37,10 @@ class PostBmpAsyncHttpRequest(
             connection.useCaches = false
             connection.connect()
 
-            val out = BufferedOutputStream(connection.outputStream)
-            out.write(jpg.toByteArray())
-            out.flush()
+            BufferedOutputStream(connection.outputStream).run {
+                this.write(jpg.toByteArray())
+                this.flush()
+            }
 
             val inputStream = connection.inputStream
             val reader = BufferedReader(InputStreamReader(inputStream, "UTF-8"))
@@ -49,7 +49,6 @@ class PostBmpAsyncHttpRequest(
             while ((line) != null) {
                 sb.append(line)
                 inputStream.close()
-
                 line = reader.readLine()
             }
 
@@ -59,7 +58,6 @@ class PostBmpAsyncHttpRequest(
             connection.disconnect()
         }
         return sb.toString()
-
     }
 
     override fun onPostExecute(result: String?) {
