@@ -1,7 +1,6 @@
 package com.example.asaco2
 
 import android.Manifest
-import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
@@ -54,11 +53,6 @@ class MainActivity : AppCompatActivity() {
         )
     }
 
-    //    private val fileFolder by lazy {
-//        getExternalFilesDir(
-//            Environment.DIRECTORY_DCIM
-//        )
-//    }
     private val prefs: SharedPreferences by lazy {
         getSharedPreferences("User", Context.MODE_PRIVATE)
     }
@@ -68,12 +62,6 @@ class MainActivity : AppCompatActivity() {
         File(getExternalFilesDir(Environment.DIRECTORY_DCIM), setTime())
     }
 
-//    private val uri: Uri by lazy {
-//        FileProvider.getUriForFile(
-//            this, applicationContext.packageName + ".fileprovider",
-//            file
-//        )
-//    }
 
     private val navView: NavigationView by lazy {
         nav_view.apply {
@@ -81,7 +69,6 @@ class MainActivity : AppCompatActivity() {
                 when (it.itemId) {
                     R.id.nav_slideshow -> {
                         checkPermission()
-//                    openIntent()
                         true
                     }
 
@@ -110,11 +97,13 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        title = "カレンダー画面"
+
         setSupportActionBar(toolbar)
 
         fab.setOnClickListener {
+
             //カメラボタンが押されたときになんかするやつ
-//            openIntent()
             checkPermission()
         }
 
@@ -129,15 +118,12 @@ class MainActivity : AppCompatActivity() {
             it.syncState()
         }
 
-        supportFragmentManager.beginTransaction().let {
-            it.add(R.id.nav_host_fragment, Calendar())
-            it.commit()
-        }
-
         //スライドメニューの各項目を押したとき
         navView
         setFragment = Calendar()
         setHeader(navView)
+        navView.setCheckedItem(R.id.nav_calendar)
+        action(Calendar())
     }
 
     override fun onSupportNavigateUp(): Boolean =
@@ -154,13 +140,6 @@ class MainActivity : AppCompatActivity() {
             startActivityForResult(this, CAMERA_REQUEST_CODE)
         }
     }
-
-    //右上の…を設定するやつ
-//    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-//        // Inflate the menu; this adds items to the action bar if it is present.
-//        menuInflater.inflate(R.menu.activity_main_drawer, menu)
-//        return true
-//    }
 
     private fun checkCameraPermission() =
         PackageManager.PERMISSION_GRANTED ==
@@ -225,7 +204,6 @@ class MainActivity : AppCompatActivity() {
         return true
     }
 
-    @SuppressLint("SetTextI18n")
     private fun setHeader(navView: NavigationView) {
         getSharedPreferences("User", Context.MODE_PRIVATE).let { data ->
 
@@ -281,10 +259,12 @@ class MainActivity : AppCompatActivity() {
 
 
     override fun onBackPressed() {
-        when (setFragment) {
-            is Calendar -> super.onBackPressed()
+        when (navView.checkedItem?.itemId) {
+            R.id.nav_calendar -> super.onBackPressed()
 
             else -> {
+                title = "カレンダー画面"
+                navView.setCheckedItem(R.id.nav_calendar)
                 action(Calendar())
 
             }

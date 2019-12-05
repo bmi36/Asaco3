@@ -17,7 +17,6 @@ class CameraActivity : AppCompatActivity() {
         val bmp = intent?.extras?.get("data") as Bitmap
         cameraImag.setImageBitmap(bmp)
 
-        PostBmpAsyncHttpRequest(setIntent(bmp)).execute(Param(HTTP, bmp))
     }
 
     private fun setIntent(bmp: Bitmap) {

@@ -2,10 +2,12 @@ package com.example.asaco2.ui.tools
 
 import android.content.SharedPreferences
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.example.asaco2.R
 import com.google.android.material.navigation.NavigationView
@@ -26,32 +28,37 @@ class ToolsFragment(
     ): View? =
         inflater.inflate(R.layout.fragment_tools, container, false).also {
             it.userName.setText(prefs.getString("name", "HUNTER"), TextView.BufferType.NORMAL)
-            it.wight.setText(prefs.getInt("wight", 0).toString(), TextView.BufferType.NORMAL)
-            it.high.setText(prefs.getInt("height", 0).toString(), TextView.BufferType.NORMAL)
+            it.weight.setText(prefs.getFloat("weight", 0f).toString(), TextView.BufferType.NORMAL)
+            it.high.setText(prefs.getFloat("height", 0f).toString(), TextView.BufferType.NORMAL)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         UserButton.setOnClickListener {
-            val editor = prefs.edit()
-            val str = userName.text.toString()
-            val wint = high.text.toString().toInt()
-            val hint = wight.text.toString().toInt()
-            val bmi = if (wint == 0 || hint == 0) {
-                0
-            } else {
-                val tmp = (hint * hint) / 10
-                wint * 1000 / tmp
-            }
+            try {
+                val editor = prefs.edit()
+                val str = userName.text.toString()
+                val wint = weight.text.toString().toDouble()
+                val hint = high.text.toString().toDouble()
+                val temp = (hint * hint) / 10000
 
-            editor.putString("name", str)
-            editor.putInt("wight", hint)
-            editor.putInt("height", wint)
-            editor.putInt("bmi", bmi)
-            navView.UserName.text = str
-            navView.bmiText.text = "   BMI:$bmi"
-            editor.apply()
+                Log.d("test", wint.toString())
+                Log.d("test", hint.toString())
+
+                val bmi = (wint / temp).toInt()
+
+                Log.d("test", bmi.toString())
+                editor.putString("name", str)
+                editor.putFloat("weight", wint.toFloat())
+                editor.putFloat("height", hint.toFloat())
+                editor.putInt("bmi", bmi)
+                navView.UserName.text = str
+                navView.bmiText.text = "   BMI:$bmi"
+                editor.apply()
+            } catch (e: Exception) {
+                Toast.makeText(activity, "もう一度やり直してください", Toast.LENGTH_SHORT)
+            }
         }
     }
 }

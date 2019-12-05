@@ -8,6 +8,7 @@ import kotlinx.android.synthetic.main.activity_memo.*
 
 class Memo : AppCompatActivity() {
 
+    @Suppress("RECEIVER_NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_memo)
@@ -17,11 +18,7 @@ class Memo : AppCompatActivity() {
                 "day"
             )}日だよ"
         val calendar: CalendarEntity = intent.extras.get("calendar") as CalendarEntity
-        string = if (calendar.id != null) {
-            "$string\n$calendar"
-        } else {
-            "$string\nなにもないよ"
-        }
+        string = "$string\n$calendar"
         dayText.text = string
 
         val action = supportActionBar
