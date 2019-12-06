@@ -22,7 +22,7 @@ class CameraActivity : AppCompatActivity() {
     private fun setIntent(bmp: Bitmap) {
         startActivity(
             Intent(this, CameraResultActivity::class.java).apply {
-                intent.putExtra("data", bmp)
+                this.putExtra("data", bmp)
             })
 
     }
