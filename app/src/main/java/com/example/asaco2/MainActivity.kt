@@ -1,13 +1,14 @@
 package com.example.asaco2
 
 import android.Manifest
+import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
+import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
@@ -16,12 +17,14 @@ import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
+import androidx.core.net.toUri
 import androidx.core.view.GravityCompat
 import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
+import com.example.asaco2.ui.camera.CameraResult
 import com.example.asaco2.ui.gallery.GalleryFragment
 import com.example.asaco2.ui.home.Calendar
 import com.example.asaco2.ui.tools.ToolsFragment
@@ -29,9 +32,12 @@ import com.google.android.material.navigation.NavigationView
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.app_bar_main.*
 import kotlinx.android.synthetic.main.nav_header_main.view.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.coroutines.CoroutineContext
 
 
 const val CAMERA_REQUEST_CODE = 1
@@ -39,12 +45,13 @@ const val CAMERA_PERMISSION_REQUEST_CODE = 2
 const val FILE_PERMISSION_REQUEST_CODE = 3
 const val HUNTER = "HUNTER"
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), CoroutineScope {
 
     private lateinit var setFragment: Fragment
 
     // Passing each menu ID as a set of Ids because each
     // menu should be considered as top level destinations.
+
     private val appBarConfiguration: AppBarConfiguration by lazy {
         AppBarConfiguration(
             setOf(
@@ -57,18 +64,14 @@ class MainActivity : AppCompatActivity() {
         getSharedPreferences("User", Context.MODE_PRIVATE)
     }
 
-    private val file: File by lazy {
-
-        File(getExternalFilesDir(Environment.DIRECTORY_DCIM), setTime())
-    }
-
-
     private val navView: NavigationView by lazy {
         nav_view.apply {
             this.setNavigationItemSelectedListener {
                 when (it.itemId) {
                     R.id.nav_slideshow -> {
+                        action(null)
                         checkPermission()
+
                         true
                     }
 
@@ -104,9 +107,13 @@ class MainActivity : AppCompatActivity() {
         fab.setOnClickListener {
 
             //カメラボタンが押されたときになんかするやつ
+            drawer_layout.closeDrawer(GravityCompat.START)
             checkPermission()
+
+
         }
 
+        //どろわーの設定
         ActionBarDrawerToggle(
             this,
             drawer_layout,
@@ -118,8 +125,6 @@ class MainActivity : AppCompatActivity() {
             it.syncState()
         }
 
-        //スライドメニューの各項目を押したとき
-        navView
         setFragment = Calendar()
         setHeader(navView)
         navView.setCheckedItem(R.id.nav_calendar)
@@ -130,28 +135,51 @@ class MainActivity : AppCompatActivity() {
         findNavController(R.id.nav_host_fragment)
             .navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
 
+    private lateinit var file: File
 
+    private lateinit var uri: Uri
+
+    //写真を取るときのやつ
     private fun takePicture() {
+        val folder = getExternalFilesDir(Environment.DIRECTORY_DCIM)
+        val name = SimpleDateFormat("ddHHmmss", Locale.US).format(Date()).let {
+            String.format("CameraIntent_%s.jpg", it)
+        }
+        file = File(folder, name)
+        uri = FileProvider.getUriForFile(
+            applicationContext, "$packageName.fileprovider",
+            file
+        )
 
-        Intent(MediaStore.ACTION_IMAGE_CAPTURE).apply {
-            //            putExtra(MediaStore.EXTRA_OUTPUT, uri)
-            addCategory(Intent.CATEGORY_DEFAULT)
-        }.run {
-            startActivityForResult(this, CAMERA_REQUEST_CODE)
+        Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+            .putExtra(MediaStore.EXTRA_OUTPUT, uri).run {
+                startActivityForResult(this, CAMERA_REQUEST_CODE)
+            }
+    }
+
+    //ぱーにっしょんをリクエストするやつ
+    private fun requestPermission() {
+        val str: Array<String> = arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+
+        if (ActivityCompat.shouldShowRequestPermissionRationale(
+                this,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE
+            )
+        ) {
+            ActivityCompat.requestPermissions(this, str, CAMERA_PERMISSION_REQUEST_CODE)
         }
     }
 
-    private fun checkCameraPermission() =
-        PackageManager.PERMISSION_GRANTED ==
-                ContextCompat.checkSelfPermission(
-                    applicationContext, Manifest.permission.CAMERA
-                )
+    //ぱーにっしょん確認するやつ
+    private fun checkPermission() {
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE
+            )
+            == PackageManager.PERMISSION_GRANTED
+        ) takePicture() else requestPermission()
+    }
 
-    private fun grantCameraPermission() =
-        ActivityCompat.requestPermissions(
-            this, arrayOf(Manifest.permission.CAMERA),
-            CAMERA_PERMISSION_REQUEST_CODE
-        )
 
     override fun onRequestPermissionsResult(
         requestCode: Int,
@@ -167,32 +195,22 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    //写真を撮った後のやつ
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == CAMERA_REQUEST_CODE) {
-
-            registerDatabase(file)
-            BitmapFactory.Options().inSampleSize = 10
-
-            data?.extras?.get("data").let {
-                Intent(this, CameraActivity::class.java).apply {
-                    putExtra("data", it as Bitmap)
-                    startActivity(this)
-                }
+        if (resultCode == Activity.RESULT_OK) {
+            if (requestCode == CAMERA_REQUEST_CODE) {
+                registerDatabase(file)
+                val intent = Intent(this, CameraResult::class.java)
+                    .putExtra("file", file.toUri())
+                    .putExtra("uri", uri)
+                startActivity(intent)
             }
         }
     }
 
 
-    private fun openIntent() {
-        Intent(MediaStore.ACTION_IMAGE_CAPTURE).resolveActivity(packageManager)?.let {
-
-            if (checkCameraPermission()) takePicture() else grantCameraPermission()
-
-        } ?: Toast.makeText(this, "カメラを扱うアプリがありません", Toast.LENGTH_LONG).show()
-
-    }
-
+    //フラグメントの切り替えのやつ
     private fun action(fragment: Fragment?): Boolean {
         if (fragment != null) {
             supportFragmentManager.beginTransaction().also {
@@ -204,6 +222,8 @@ class MainActivity : AppCompatActivity() {
         return true
     }
 
+    //スライドメニューのへっだーのやつ
+    @SuppressLint("SetTextI18n")
     private fun setHeader(navView: NavigationView) {
         getSharedPreferences("User", Context.MODE_PRIVATE).let { data ->
 
@@ -224,55 +244,30 @@ class MainActivity : AppCompatActivity() {
 
 
     private fun registerDatabase(file: File) {
-        ContentValues().let {
-            it.put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
-            it.put("data", file.absolutePath)
-            this.contentResolver.run {
-                this.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, it)
-            }
+        val contentValues = ContentValues().also {
+            it.put(MediaStore.Images.Media.MIME_TYPE, "image/jpg")
+            it.put("_data", file.absolutePath)
         }
-    }
-
-    private fun requestFilePermission() {
-
-        if (!ActivityCompat.shouldShowRequestPermissionRationale(
-                this,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE
-            )
-        ) Toast.makeText(
-            this, "許可されないとアプリが実行できません",
-            Toast.LENGTH_SHORT
-        ).show()
-
-        arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE).let {
-            ActivityCompat.requestPermissions(this, it, FILE_PERMISSION_REQUEST_CODE)
-        }
-    }
-
-    private fun checkPermission() {
-        if (ActivityCompat.checkSelfPermission
-                (this, Manifest.permission.WRITE_EXTERNAL_STORAGE) ==
-            PackageManager.PERMISSION_GRANTED
-        )
-            openIntent() else requestFilePermission()
+        this.contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
     }
 
 
     override fun onBackPressed() {
         when (navView.checkedItem?.itemId) {
             R.id.nav_calendar -> super.onBackPressed()
-
             else -> {
                 title = "カレンダー画面"
                 navView.setCheckedItem(R.id.nav_calendar)
                 action(Calendar())
-
             }
         }
     }
+
+    override val coroutineContext: CoroutineContext
+        get() = Job()
 }
 
-fun setTime() =
-    SimpleDateFormat("YYMMddhhmmss", Locale.US).format(Date()).run {
-        String.format("CameraIntent_%s.jpg", this)
-    }
+//fun setTime() =
+//    SimpleDateFormat("YYMMddhhmmss", Locale.US).format(Date()).run {
+//        String.format("CameraIntent_%s.jpg", this)
+//    }

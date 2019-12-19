@@ -5,16 +5,17 @@
     <string name="nav_header_title">Android Studio</string>
     <string name="nav_header_subtitle">android.studio@android.com</string>
     <string name="nav_header_desc">Navigation header</string>
-    <string name="action_settings">Settings</string>
 
-    <string name="menu_home">Home</string>
-    <string name="menu_gallery">Gallery</string>
-    <string name="menu_slideshow">Slideshow</string>
-    <string name="menu_tools">Tools</string>
-    <string name="name">梅田ひろし</string>
     <string name="BMI">BMI36</string>
     <string name="Cal">カロリー:</string>
     <string name="user">ユーザー名：</string>
     <string name="update">更新する</string>
     <string name="sintyou">身長(cm)：</string>
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="loading">now loading…</string>
+    <string name="errortext">もう一度やり直してください</string>
+    <string name="foodname">料理名：</string>
+    <string name="missteke">やめる</string>
+    <string name="filedText">もう一度やり直してください</string>
+    <string name="ok">決定</string>
 </resources>
