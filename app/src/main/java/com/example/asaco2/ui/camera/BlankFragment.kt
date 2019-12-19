@@ -11,9 +11,7 @@ import kotlinx.android.synthetic.main.fragment_blank.*
 import kotlinx.coroutines.*
 import kotlin.coroutines.CoroutineContext
 
-class LoaderFragment(
-    private val onAction: Unit
-) : Fragment(), CoroutineScope {
+class LoaderFragment : Fragment(){
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -27,9 +25,5 @@ class LoaderFragment(
         super.onViewCreated(view, savedInstanceState)
 
         progressBar.visibility = ProgressBar.VISIBLE
-        launch(Dispatchers.Main) { withContext(Dispatchers.Default) { onAction } }
     }
-
-    override val coroutineContext: CoroutineContext
-        get() = Job()
 }
