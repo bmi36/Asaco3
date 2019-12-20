@@ -49,6 +49,7 @@ class CameraResult : AppCompatActivity(), CoroutineScope {
                     override fun onResponse(call: Call<Cook>, response: Response<Cook>) {
 
                         if (response.body() != null) {
+
                             val cock = response.body() as Cook
                             supportFragmentManager.beginTransaction()
                                 .replace(frame.id, ImageSuccessFragment(uri, cock)).commit()
