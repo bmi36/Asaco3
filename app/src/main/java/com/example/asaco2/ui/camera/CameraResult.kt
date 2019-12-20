@@ -3,6 +3,7 @@ package com.example.asaco2.ui.camera
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.widget.FrameLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.net.toFile
@@ -41,7 +42,10 @@ class CameraResult : AppCompatActivity(), CoroutineScope {
         withContext(Dispatchers.Default){
             retrofitBuild().create(RetrofitInterface::class.java)
                 .sendImage(baseImage).enqueue(object : Callback<Cook> {
+
                     override fun onFailure(call: Call<Cook>, t: Throwable) {
+
+                        Log.d("test",t.message)
                         supportFragmentManager.beginTransaction().replace(frame.id, ImageFileFragment())
                             .commit()
                     }

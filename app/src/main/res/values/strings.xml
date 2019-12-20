@@ -18,4 +18,5 @@
     <string name="missteke">やめる</string>
     <string name="filedText">もう一度やり直してください</string>
     <string name="ok">決定</string>
+    <string name="todo">TODO</string>
 </resources>
