@@ -33,7 +33,6 @@ class CameraResult : AppCompatActivity(), CoroutineScope {
             .replace(frame.id, LoaderFragment())
             .commitNow()
         job(uri,file).start()
-
     }
 
     private fun job(uri: Uri, file: File) = launch(Dispatchers.Main){
