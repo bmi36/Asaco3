@@ -24,25 +24,24 @@
         android:layout_height="wrap_content"
         android:text="@string/foodname"
         android:textAppearance="@style/TextAppearance.AppCompat.Large"
-        app:layout_constraintBottom_toTopOf="@+id/caloryText"
         app:layout_constraintEnd_toEndOf="@+id/caloryText"
-        app:layout_constraintHorizontal_bias="0.2"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="@+id/caloryText"
-        app:layout_constraintTop_toBottomOf="@+id/cameraImage"
-        app:layout_constraintVertical_bias="0.98" />
+        app:layout_constraintTop_toBottomOf="@+id/cameraImage" />
 
     <TextView
         android:id="@+id/caloryText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
         android:text="@string/Cal"
         android:textAppearance="@style/TextAppearance.AppCompat.Large"
-        app:layout_constraintBottom_toTopOf="@+id/okbutton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/nameText" />
 
     <Button
         android:id="@+id/okbutton"
@@ -71,10 +70,11 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:ems="10"
-        android:inputType="textPersonName"
         android:background="#00000000"
         app:layout_constraintBottom_toBottomOf="@+id/caloryText"
         app:layout_constraintStart_toEndOf="@+id/caloryText"
-        app:layout_constraintTop_toTopOf="@+id/caloryText" />
+        app:layout_constraintTop_toTopOf="@+id/caloryText"
+        android:inputType="number"/>
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

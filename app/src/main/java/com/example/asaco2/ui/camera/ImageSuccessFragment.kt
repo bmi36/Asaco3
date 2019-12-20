@@ -26,7 +26,12 @@ class ImageSuccessFragment(
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        cameraImage.setImageURI(uri)
+
+        cameraImage.run {
+            setImageURI(uri)
+            adjustViewBounds = true
+        }
+
         cooknametext.setText(cook.foodname,TextView.BufferType.EDITABLE)
         caltext.setText(cook.calorie.toString(),TextView.BufferType.EDITABLE)
         okbutton.setOnClickListener {

@@ -190,8 +190,6 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
             if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 takePicture()
             }
-        } else {
-            Toast.makeText(this, "うんこ💩💩💩", Toast.LENGTH_SHORT).show()
         }
     }
 

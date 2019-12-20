@@ -28,9 +28,9 @@ class ToolsFragment(
     ): View? =
         inflater.inflate(R.layout.fragment_tools, container, false).also {
             it.userName.setText(prefs.getString("name", "HUNTER"), TextView.BufferType.NORMAL)
-            it.weight.setText(prefs.getFloat("weight", 0f).toString(), TextView.BufferType.NORMAL)
-            it.high.setText(prefs.getFloat("height", 0f).toString(), TextView.BufferType.NORMAL)
-    }
+            it.weight.setText(prefs.getString("weight", "0"), TextView.BufferType.NORMAL)
+            it.high.setText(prefs.getString("height", "0"), TextView.BufferType.NORMAL)
+        }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -50,8 +50,8 @@ class ToolsFragment(
 
                 Log.d("test", bmi.toString())
                 editor.putString("name", str)
-                editor.putFloat("weight", wint.toFloat())
-                editor.putFloat("height", hint.toFloat())
+                editor.putString("weight", wint.toString())
+                editor.putString("height", hint.toString())
                 editor.putInt("bmi", bmi)
                 navView.UserName.text = str
                 navView.bmiText.text = "   BMI:$bmi"
