@@ -241,6 +241,7 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
     }
 
 
+
     private fun registerDatabase(file: File) {
         val contentValues = ContentValues().also {
             it.put(MediaStore.Images.Media.MIME_TYPE, "image/jpg")
