@@ -10,12 +10,14 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.example.asaco2.R
 import kotlinx.android.synthetic.main.fragment_home.*
+import java.lang.Exception
 
 
-class Calendar(private val viewModel: CalendarViewModel) : Fragment() {
+class Calendar : Fragment() {
 
 
     private lateinit var list: Array<CalendarEntity>
+    private lateinit var viewModel: CalendarViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -48,6 +50,11 @@ class Calendar(private val viewModel: CalendarViewModel) : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        viewModel = activity?.run {
+            ViewModelProviders.of(this)[CalendarViewModel::class.java]
+        } ?: throw Exception("Invalid Activity")
+
         viewModel.allCalendar.observe(this, Observer {
             if (it != null) list = it
         })

@@ -52,9 +52,9 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
 
     private lateinit var setFragment: Fragment
 
-    private val viewModel: CalendarViewModel by lazy {
-        ViewModelProviders.of(this).get(CalendarViewModel::class.java)
-    }
+//    private val viewModel: CalendarViewModel by lazy {
+//        ViewModelProviders.of(this).get(CalendarViewModel::class.java)
+//    }
 
     // Passing each menu ID as a set of Ids because each
     // menu should be considered as top level destinations.
@@ -84,7 +84,7 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
 
                     R.id.nav_calendar -> {
                         toolbar.title = "カレンダー画面"
-                        action(Calendar(viewModel))
+                        action(Calendar())
                     }
 
                     R.id.nav_gallery -> {
@@ -112,12 +112,9 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
         setSupportActionBar(toolbar)
 
         fab.setOnClickListener {
-
             //カメラボタンが押されたときになんかするやつ
             drawer_layout.closeDrawer(GravityCompat.START)
             checkPermission()
-
-
         }
 
         //どろわーの設定
@@ -132,10 +129,10 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
             it.syncState()
         }
 
-        setFragment = Calendar(viewModel)
+        setFragment = Calendar()
         setHeader(navView)
         navView.setCheckedItem(R.id.nav_calendar)
-        action(Calendar(viewModel))
+        action(Calendar())
     }
 
     override fun onSupportNavigateUp(): Boolean =
@@ -209,7 +206,6 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
                 val intent = Intent(this, CameraResult::class.java)
                     .putExtra("file", file.toUri())
                     .putExtra("uri", uri)
-                    .putExtra("viewModel",viewModel.toString())
                 startActivity(intent)
             }
         }
@@ -265,14 +261,14 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
             else -> {
                 title = "カレンダー画面"
                 navView.setCheckedItem(R.id.nav_calendar)
-                action(Calendar(viewModel))
+                action(Calendar())
             }
         }
     }
 
-    fun insert(enttity: CalendarEntity){
-        viewModel.insert(enttity)
-    }
+//    fun insert(enttity: CalendarEntity){
+//        viewModel.insert(enttity)
+//    }
 
     override val coroutineContext: CoroutineContext
         get() = Job()
