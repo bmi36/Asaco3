@@ -12,11 +12,8 @@ import com.example.asaco2.R
 import kotlinx.android.synthetic.main.fragment_home.*
 
 
-class Calendar : Fragment() {
+class Calendar(private val viewModel: CalendarViewModel) : Fragment() {
 
-    private val viewModel: CalendarViewModel by lazy {
-        ViewModelProviders.of(this).get(CalendarViewModel::class.java)
-    }
 
     private lateinit var list: Array<CalendarEntity>
 

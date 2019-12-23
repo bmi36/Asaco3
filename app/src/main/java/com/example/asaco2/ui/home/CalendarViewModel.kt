@@ -12,10 +12,11 @@ class CalendarViewModel(application: Application):AndroidViewModel(application) 
     private val repository: Repository
     val allCalendar: LiveData<Array<CalendarEntity>>
 
+    private var repoDao: CalendarDao = CalendarDatabase.getInstance(application).calendarDao()
+
     init {
-        val repoDao = CalendarDatabase.getInstance(application).calendarDao()
         repository = Repository(repoDao)
-        allCalendar = repository.allEntity
+            allCalendar = repository.allEntity
     }
 
     fun insert(entity: CalendarEntity) = viewModelScope.launch {

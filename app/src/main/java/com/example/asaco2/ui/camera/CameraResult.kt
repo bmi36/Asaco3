@@ -7,7 +7,14 @@ import android.util.Log
 import android.widget.FrameLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.net.toFile
+import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.viewModelScope
+import com.example.asaco2.MainActivity
 import com.example.asaco2.R
+import com.example.asaco2.ui.home.CalendarViewModel
 import kotlinx.android.synthetic.main.activity_camera_result.*
 import kotlinx.coroutines.*
 import retrofit2.Call
@@ -20,13 +27,15 @@ const val IMAGE_REQUEST_CODE = 3
 
 class CameraResult : AppCompatActivity(), CoroutineScope {
 
+//    private lateinit var viewModel: CalendarViewModel
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_camera_result)
 
+        val str = intent.getStringExtra("viewModel")
+
         val fileDir = intent.extras.get("file") as Uri
         val file: File = fileDir.toFile()
-
 
         val uri = intent.extras.get("uri") as Uri
         frame.visibility = FrameLayout.VISIBLE

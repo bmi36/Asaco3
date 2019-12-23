@@ -21,12 +21,15 @@ import androidx.core.content.FileProvider
 import androidx.core.net.toUri
 import androidx.core.view.GravityCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import com.example.asaco2.ui.camera.CameraResult
 import com.example.asaco2.ui.gallery.GalleryFragment
 import com.example.asaco2.ui.home.Calendar
+import com.example.asaco2.ui.home.CalendarEntity
+import com.example.asaco2.ui.home.CalendarViewModel
 import com.example.asaco2.ui.tools.ToolsFragment
 import com.google.android.material.navigation.NavigationView
 import kotlinx.android.synthetic.main.activity_main.*
@@ -48,6 +51,10 @@ const val HUNTER = "HUNTER"
 class MainActivity : AppCompatActivity(), CoroutineScope {
 
     private lateinit var setFragment: Fragment
+
+    private val viewModel: CalendarViewModel by lazy {
+        ViewModelProviders.of(this).get(CalendarViewModel::class.java)
+    }
 
     // Passing each menu ID as a set of Ids because each
     // menu should be considered as top level destinations.
@@ -77,7 +84,7 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
 
                     R.id.nav_calendar -> {
                         toolbar.title = "カレンダー画面"
-                        action(Calendar())
+                        action(Calendar(viewModel))
                     }
 
                     R.id.nav_gallery -> {
@@ -125,10 +132,10 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
             it.syncState()
         }
 
-        setFragment = Calendar()
+        setFragment = Calendar(viewModel)
         setHeader(navView)
         navView.setCheckedItem(R.id.nav_calendar)
-        action(Calendar())
+        action(Calendar(viewModel))
     }
 
     override fun onSupportNavigateUp(): Boolean =
@@ -202,6 +209,7 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
                 val intent = Intent(this, CameraResult::class.java)
                     .putExtra("file", file.toUri())
                     .putExtra("uri", uri)
+                    .putExtra("viewModel",viewModel.toString())
                 startActivity(intent)
             }
         }
@@ -257,9 +265,13 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
             else -> {
                 title = "カレンダー画面"
                 navView.setCheckedItem(R.id.nav_calendar)
-                action(Calendar())
+                action(Calendar(viewModel))
             }
         }
+    }
+
+    fun insert(enttity: CalendarEntity){
+        viewModel.insert(enttity)
     }
 
     override val coroutineContext: CoroutineContext
