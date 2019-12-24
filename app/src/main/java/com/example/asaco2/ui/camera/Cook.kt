@@ -7,5 +7,5 @@ data class Cook(
     val calorie: Int
 )
 
-fun Cook.toJson(): String = Gson().toJson(this)
+fun <T>T.toJson(): String = Gson().toJson(this)
 fun String.toDataClass(): Cook = Gson().fromJson(this, Cook::class.java)

@@ -14,7 +14,7 @@ interface CalendarDao {
     fun getEntity(): LiveData<Array<CalendarEntity>>
 
     @Query("select * from Entity where id = :id")
-    fun getEntity(id: Long): LiveData<CalendarEntity>
+    fun getEntity(id: Long): CalendarEntity?
 
     //リストに追加
     @Insert

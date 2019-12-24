@@ -12,16 +12,16 @@ data class CalendarEntity(
     var id: Long,
 
     @ColumnInfo(name = "entity_food")
-    var food: String,
+    var food: String?,
 
     @ColumnInfo(name= "entity_burned")
-    var burned: Int,
+    var burned: Int?,
 
     @ColumnInfo(name = "entity_absorption")
-    var absorption: Int,
+    var absorption: Int?,
 
     @ColumnInfo(name = "entity_step")
-    var step: Int
+    var step: Int?
 
 
 ):Serializable

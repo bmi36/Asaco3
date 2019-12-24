@@ -5,13 +5,14 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import java.sql.SQLException
 
 class CalendarViewModel(application: Application):AndroidViewModel(application) {
 
     private val repository: Repository
     val allCalendar: LiveData<Array<CalendarEntity>>
-
+    lateinit var SelectCalendar: LiveData<CalendarEntity>
     private var repoDao: CalendarDao = CalendarDatabase.getInstance(application).calendarDao()
 
     init {
@@ -19,13 +20,9 @@ class CalendarViewModel(application: Application):AndroidViewModel(application) 
             allCalendar = repository.allEntity
     }
 
-    fun insert(entity: CalendarEntity) = viewModelScope.launch {
-        repository.insert(entity)
-    }
+    fun insert(entity: CalendarEntity) = viewModelScope.launch { repository.insert(entity) }
 
-    fun update(entity: CalendarEntity) = viewModelScope.launch {
-        repository.update(entity)
-    }
+    fun update(entity: CalendarEntity) = viewModelScope.launch { repository.update(entity) }
 
     fun InsertOrUpdata(entity: CalendarEntity) = viewModelScope.launch {
         try {
@@ -35,4 +32,5 @@ class CalendarViewModel(application: Application):AndroidViewModel(application) 
             repository.update(entity)
         }
     }
+    fun getCalendar(id: Long): CalendarEntity? = repository.getCalendar(id)
 }

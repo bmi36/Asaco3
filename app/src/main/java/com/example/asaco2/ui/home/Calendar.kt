@@ -1,5 +1,6 @@
 package com.example.asaco2.ui.home
 
+import android.content.Entity
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -15,8 +16,6 @@ import java.lang.Exception
 
 class Calendar : Fragment() {
 
-
-    private lateinit var list: Array<CalendarEntity>
     private lateinit var viewModel: CalendarViewModel
 
     override fun onCreateView(
@@ -28,35 +27,41 @@ class Calendar : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-
-
         calendarView.setOnDateChangeListener { _, year, month, dayOfMonth ->
+
             var intent = Intent(activity, MemoNullActivity::class.java)
-            val id = year.toLong() + month.toLong() + dayOfMonth.toLong()
-            for (element in list) {
-                if (element.id == id) {
-                    intent = Intent(activity, Memo::class.java).apply {
-                        this.putExtra("calendar", element)
-                        this.putExtra("year", year)
-                        this.putExtra("month", month)
-                        this.putExtra("day", dayOfMonth)
-                    }
-                    break
-                }
+
+            val id = "$year$month$dayOfMonth".toLong()
+
+            viewModel = activity?.run {
+                ViewModelProviders.of(this)[CalendarViewModel::class.java]
+            } ?: throw Exception("Invalid Activity")
+
+            val element = viewModel.getCalendar(id).let {
+
             }
-            startActivity(intent)
+//                if (element == null) {
+//                    intent = Intent(activity, Memo::class.java).apply {
+//                        this.putExtra("calendar", element)
+//                        this.putExtra("year", year)
+//                        this.putExtra("month", month)
+//                        this.putExtra("day", dayOfMonth)
+//                    }
+//                    break
+//                }
+//            }
+//            startActivity(intent)
+//        }
         }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        viewModel = activity?.run {
-            ViewModelProviders.of(this)[CalendarViewModel::class.java]
-        } ?: throw Exception("Invalid Activity")
+
 
         viewModel.allCalendar.observe(this, Observer {
-            if (it != null) list = it
+            //            if (it != null) list = it
         })
     }
 }

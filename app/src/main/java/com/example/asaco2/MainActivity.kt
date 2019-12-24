@@ -67,10 +67,12 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
         )
     }
 
+
     private val prefs: SharedPreferences by lazy {
         getSharedPreferences("User", Context.MODE_PRIVATE)
     }
 
+//    ナビゲーションの初期化
     private val navView: NavigationView by lazy {
         nav_view.apply {
             this.setNavigationItemSelectedListener {
@@ -245,7 +247,7 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
     }
 
 
-
+//画像をDBに保存するやつ
     private fun registerDatabase(file: File) {
         val contentValues = ContentValues().also {
             it.put(MediaStore.Images.Media.MIME_TYPE, "image/jpg")
@@ -254,7 +256,7 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
         this.contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
     }
 
-
+//バックボタンを押したときのやつ
     override fun onBackPressed() {
         when (navView.checkedItem?.itemId) {
             R.id.nav_calendar -> super.onBackPressed()
