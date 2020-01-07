@@ -8,33 +8,32 @@ import kotlinx.android.synthetic.main.activity_memo.*
 
 class Memo : AppCompatActivity() {
 
-    @Suppress("RECEIVER_NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_memo)
-
-        var string =
-            "${intent.extras.getInt("year")}年${intent.extras.getInt("month") + 1}月${intent.extras.getInt(
-                "day"
-            )}日だよ"
-        val calendar: CalendarEntity = intent.extras.get("calendar") as CalendarEntity
-        string = "$string\n$calendar"
-        dayText.text = string
-
-        val action = supportActionBar
-        action?.title = "詳細画面"
-        action?.setHomeButtonEnabled(true)
-        action?.setDisplayHomeAsUpEnabled(true)
+//
+//        var string =
+//            "${intent.extras.getInt("year")}年${intent.extras.getInt("month") + 1}月${intent.extras.getInt(
+//                "day"
+//            )}日だよ"
+//        val calendar: CalendarEntity = intent.extras.get("calendar") as CalendarEntity
+//        string = "$string\n$calendar"
+//        dayText.text = string
+//
+//        val action = supportActionBar
+//        action?.title = "詳細画面"
+//        action?.setHomeButtonEnabled(true)
+//        action?.setDisplayHomeAsUpEnabled(true)
     }
-
-    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        return when (item?.itemId) {
-            android.R.id.home -> {
-                finish()
-                true
-            }
-            else -> super.onOptionsItemSelected(item)
-        }
-
-    }
+//
+//    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+//        return when (item?.itemId) {
+//            android.R.id.home -> {
+//                finish()
+//                true
+//            }
+//            else -> super.onOptionsItemSelected(item)
+//        }
+//
+//    }
 }

@@ -8,10 +8,16 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProviders
 import com.example.asaco2.R
+import com.example.asaco2.ui.camera.toDataClass
 import kotlinx.android.synthetic.main.fragment_home.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import kotlin.coroutines.CoroutineContext
 
 
-class Calendar : Fragment() {
+class Calendar : Fragment(), CoroutineScope {
 
     private lateinit var viewModel: CalendarViewModel
 
@@ -26,23 +32,28 @@ class Calendar : Fragment() {
 
         calendarView.setOnDateChangeListener { _, year, month, dayOfMonth ->
 
-            val id = "$year$month$dayOfMonth".toLong()
+            val strMonth = if (month > 9)"${month+1}" else "0${month+1}"
+            val strDay = if(dayOfMonth > 9) "$dayOfMonth" else "0${dayOfMonth}"
+            val id =
+                "$year$strMonth$strDay".toLong()
 
             viewModel = activity?.run {
                 ViewModelProviders.of(this)[CalendarViewModel::class.java]
             } ?: throw Exception("Invalid Activity")
 
-            Thread {
+            launch {
                 var intent = Intent(activity, MemoNullActivity::class.java)
                 val element = viewModel.getCalendar(id)
                 if (element != null) {
-                    if (element.isEmpty())
-                        intent = Intent(activity,Memo::class.java)
-                        intent.putExtra("list", element.toTypedArray())
+                    if (element.isNotEmpty())
+                        intent = Intent(activity, Memo::class.java)
+                    intent.putExtra("list", element.toTypedArray())
                 }
                 startActivity(intent)
             }
         }
     }
-}
 
+    override val coroutineContext: CoroutineContext
+        get() = Job()
+}
