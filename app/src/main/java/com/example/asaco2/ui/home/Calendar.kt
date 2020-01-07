@@ -31,6 +31,7 @@ class Calendar : Fragment() {
             viewModel = activity?.run {
                 ViewModelProviders.of(this)[CalendarViewModel::class.java]
             } ?: throw Exception("Invalid Activity")
+
             Thread {
                 var intent = Intent(activity, MemoNullActivity::class.java)
                 val element = viewModel.getCalendar(id)
