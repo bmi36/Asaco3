@@ -26,14 +26,14 @@ class ToolsFragment(
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? =
-        inflater.inflate(R.layout.fragment_tools, container, false).also {
-            it.userName.setText(prefs.getString("name", "HUNTER"), TextView.BufferType.NORMAL)
-            it.weight.setText(prefs.getString("weight", "0"), TextView.BufferType.NORMAL)
-            it.high.setText(prefs.getString("height", "0"), TextView.BufferType.NORMAL)
-        }
+        inflater.inflate(R.layout.fragment_tools, container, false)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        userName.setText(prefs.getString("name", "HUNTER"))
+        weight.setText(prefs.getString("weight", "0"))
+        high.setText(prefs.getString("height", "0"))
 
         UserButton.setOnClickListener {
             try {

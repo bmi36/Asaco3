@@ -45,7 +45,6 @@ import kotlin.coroutines.CoroutineContext
 
 const val CAMERA_REQUEST_CODE = 1
 const val CAMERA_PERMISSION_REQUEST_CODE = 2
-const val FILE_PERMISSION_REQUEST_CODE = 3
 const val HUNTER = "HUNTER"
 
 class MainActivity : AppCompatActivity(), CoroutineScope {
@@ -267,10 +266,6 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
             }
         }
     }
-
-//    fun insert(enttity: CalendarEntity){
-//        viewModel.insert(enttity)
-//    }
 
     override val coroutineContext: CoroutineContext
         get() = Job()

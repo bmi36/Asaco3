@@ -13,7 +13,7 @@ class Repository(private val dao: CalendarDao) {
     suspend fun update(entity: CalendarEntity){
         dao.update(entity)
     }
-    fun getCalendar(id: Long): CalendarEntity? {
+    fun getCalendar(id: Long): List<CalendarEntity>? {
         return dao.getEntity(id)
     }
 

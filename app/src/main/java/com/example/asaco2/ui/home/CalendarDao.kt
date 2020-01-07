@@ -13,8 +13,8 @@ interface CalendarDao {
     @Query("select * from Entity")
     fun getEntity(): LiveData<Array<CalendarEntity>>
 
-    @Query("select * from Entity where id = :id")
-    fun getEntity(id: Long): CalendarEntity?
+    @Query("select * from Entity where id like :id || '%'")
+    fun getEntity(id: Long): List<CalendarEntity>?
 
     //リストに追加
     @Insert
@@ -23,8 +23,6 @@ interface CalendarDao {
     //リストを更新
     @Update
     suspend fun update(entity: CalendarEntity)
-
-
 
 
 }

@@ -32,5 +32,5 @@ class CalendarViewModel(application: Application):AndroidViewModel(application) 
             repository.update(entity)
         }
     }
-    fun getCalendar(id: Long): CalendarEntity? = repository.getCalendar(id)
+    fun getCalendar(id: Long): List<CalendarEntity>? = repository.getCalendar(id)
 }
