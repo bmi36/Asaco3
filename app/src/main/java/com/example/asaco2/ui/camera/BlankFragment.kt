@@ -8,8 +8,6 @@ import android.widget.ProgressBar
 import androidx.fragment.app.Fragment
 import com.example.asaco2.R
 import kotlinx.android.synthetic.main.fragment_blank.*
-import kotlinx.coroutines.*
-import kotlin.coroutines.CoroutineContext
 
 class LoaderFragment : Fragment(){
 

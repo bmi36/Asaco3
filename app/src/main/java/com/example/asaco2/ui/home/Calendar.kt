@@ -5,15 +5,16 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.widget.NestedScrollView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProviders
 import com.example.asaco2.R
-import com.example.asaco2.ui.camera.toDataClass
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import kotlinx.android.synthetic.main.fragment_home.*
+import kotlinx.android.synthetic.main.fragment_included.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
 import kotlin.coroutines.CoroutineContext
 
 
@@ -25,15 +26,27 @@ class Calendar : Fragment(), CoroutineScope {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? = inflater.inflate(R.layout.fragment_home, container, false)
+    ): View? {
+        return inflater.inflate(R.layout.fragment_home, container, false)
+    }
+
+    private lateinit var bottomsheetBehavior: BottomSheetBehavior<NestedScrollView>
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+
+
+
+        bottom_sheet_layout.layoutParams.height = 900
+        bottomsheetBehavior = BottomSheetBehavior.from(bottom_sheet_layout)
+
         calendarView.setOnDateChangeListener { _, year, month, dayOfMonth ->
 
-            val strMonth = if (month > 9)"${month+1}" else "0${month+1}"
-            val strDay = if(dayOfMonth > 9) "$dayOfMonth" else "0${dayOfMonth}"
+            val strMonth = if (month > 9) "${month + 1}" else "0${month + 1}"
+            val strDay = if (dayOfMonth > 9) "$dayOfMonth" else "0${dayOfMonth}"
+            val dayString = "${year}年${strMonth}月${strDay}日"
+
             val id =
                 "$year$strMonth$strDay".toLong()
 
@@ -45,11 +58,12 @@ class Calendar : Fragment(), CoroutineScope {
                 var intent = Intent(activity, MemoNullActivity::class.java)
                 val element = viewModel.getCalendar(id)
                 if (element != null) {
-                    if (element.isNotEmpty())
-                        intent = Intent(activity, Memo::class.java)
-                    intent.putExtra("list", element.toTypedArray())
+                    if (element.isNotEmpty()) activity?.supportFragmentManager?.beginTransaction()
+                        ?.replace(include_frame.id, BottomSheetFragment(element))?.commit()
+
                 }
-                startActivity(intent)
+                bottomsheetBehavior.state =
+                    BottomSheetBehavior.STATE_HALF_EXPANDED
             }
         }
     }

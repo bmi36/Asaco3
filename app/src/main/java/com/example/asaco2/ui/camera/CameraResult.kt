@@ -32,8 +32,6 @@ class CameraResult : AppCompatActivity(), CoroutineScope {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_camera_result)
 
-        val str = intent.getStringExtra("viewModel")
-
         val fileDir = intent.extras.get("file") as Uri
         val file: File = fileDir.toFile()
 
