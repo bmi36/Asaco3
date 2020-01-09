@@ -11,7 +11,6 @@ import androidx.lifecycle.ViewModelProviders
 import com.example.asaco2.R
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import kotlinx.android.synthetic.main.fragment_home.*
-import kotlinx.android.synthetic.main.fragment_included.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -55,11 +54,10 @@ class Calendar : Fragment(), CoroutineScope {
             } ?: throw Exception("Invalid Activity")
 
             launch {
-                var intent = Intent(activity, MemoNullActivity::class.java)
                 val element = viewModel.getCalendar(id)
                 if (element != null) {
                     if (element.isNotEmpty()) activity?.supportFragmentManager?.beginTransaction()
-                        ?.replace(include_frame.id, BottomSheetFragment(element))?.commit()
+                        ?.replace(include_frame.id, BottomSheetFragment(element,dayString))?.commit()
 
                 }
                 bottomsheetBehavior.state =

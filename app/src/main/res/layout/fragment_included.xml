@@ -17,6 +17,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
+        android:text="○○○○年○○月○○日"
         android:textAppearance="@style/TextAppearance.AppCompat.Large"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -40,6 +41,7 @@
         android:layout_marginStart="32dp"
         android:layout_marginTop="16dp"
         android:text="麦ごはん\n卵焼き\nシーザーサラダ\na\na\na\na\na\na\na\na\na"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
         app:layout_constraintStart_toStartOf="@+id/textView7"
         app:layout_constraintTop_toBottomOf="@+id/textView7" />
 
@@ -49,6 +51,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:text="336cal\n234cal\n145cal\na\na\na\na\na\na\na\naa\na"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/foodText"
         app:layout_constraintTop_toTopOf="@+id/foodText" />
@@ -59,6 +62,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:text="合計：715cal"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
         app:layout_constraintEnd_toEndOf="@+id/foodCalText"
         app:layout_constraintTop_toBottomOf="@+id/foodCalText"
         tools:text="合計：715cal" />
@@ -80,6 +84,7 @@
         android:layout_marginStart="32dp"
         android:layout_marginTop="16dp"
         android:text="65535歩"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
         app:layout_constraintStart_toStartOf="@+id/textView12"
         app:layout_constraintTop_toBottomOf="@+id/textView12" />
 
@@ -88,6 +93,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="消費：356cal"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
         app:layout_constraintEnd_toEndOf="@+id/sumText"
         app:layout_constraintTop_toTopOf="@+id/walkText"
         tools:text="消費：356cal" />
@@ -98,6 +104,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="32dp"
         android:text="カロリー差：359cal"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
         app:layout_constraintEnd_toEndOf="@+id/walkCalText"
         app:layout_constraintTop_toBottomOf="@+id/walkCalText" />
 </androidx.constraintlayout.widget.ConstraintLayout>
