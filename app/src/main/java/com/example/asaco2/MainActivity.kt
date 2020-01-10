@@ -51,10 +51,6 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
 
     private lateinit var setFragment: Fragment
 
-//    private val viewModel: CalendarViewModel by lazy {
-//        ViewModelProviders.of(this).get(CalendarViewModel::class.java)
-//    }
-
     // Passing each menu ID as a set of Ids because each
     // menu should be considered as top level destinations.
 
@@ -270,8 +266,3 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
     override val coroutineContext: CoroutineContext
         get() = Job()
 }
-
-//fun setTime() =
-//    SimpleDateFormat("YYMMddhhmmss", Locale.US).format(Date()).run {
-//        String.format("CameraIntent_%s.jpg", this)
-//    }

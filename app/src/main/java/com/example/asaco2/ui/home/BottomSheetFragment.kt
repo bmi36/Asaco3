@@ -25,7 +25,7 @@ class BottomSheetFragment(
         var calory = ""
         var total = 0
         for (element in list) {
-            if (element == list[1]) {
+            if (element == list[0]) {
                 food = element.food.toString()
                 calory = "${element.absorption}cal"
             } else {
@@ -35,6 +35,8 @@ class BottomSheetFragment(
             total += element.absorption as Int
 
         }
-        sumText.text = "合計：${total}cal"
+//        foodText.text = food
+//        foodCalText.text = calory
+//        sumText.text = "合計：${total}cal"
     }
 }
