@@ -91,7 +91,7 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
 
                     R.id.nav_tools -> {
                         toolbar.title = "設定"
-                        action(ToolsFragment(navView, prefs))
+                        action(ToolsFragment(this@MainActivity,navView))
                     }
                     else -> action(null)
                 }
@@ -223,7 +223,7 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
 
     //スライドメニューのへっだーのやつ
     @SuppressLint("SetTextI18n")
-    private fun setHeader(navView: NavigationView) {
+     fun setHeader(navView: NavigationView) {
         getSharedPreferences("User", Context.MODE_PRIVATE).let { data ->
 
             LayoutInflater.from(this).inflate(R.layout.nav_header_main, navView, false).run {
