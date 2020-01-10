@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.example.asaco2.R
 import kotlinx.android.synthetic.main.fragment_included.*
+import kotlinx.android.synthetic.main.fragment_included.view.*
 
 
 class BottomSheetFragment(
@@ -17,26 +18,17 @@ class BottomSheetFragment(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? = inflater.inflate(R.layout.fragment_included, container, false)
+    ): View? = inflater.inflate(R.layout.fragment_included, container, false).also {
+        FoodAdapter(this, list).let { adapter -> it.recyclerView.adapter = adapter }
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        nowText.text = dayString
-        var food = ""
-        var calory = ""
         var total = 0
-        for (element in list) {
-            if (element == list[0]) {
-                food = element.food.toString()
-                calory = "${element.absorption}cal"
-            } else {
-                food += "\n${element.food}"
-                calory += "\n${element.absorption}cal"
-            }
-            total += element.absorption as Int
 
+        for (element in list) {
+            total += element.absorption as Int
         }
-//        foodText.text = food
-//        foodCalText.text = calory
-//        sumText.text = "合計：${total}cal"
+        nowText.text = dayString
+        sumText.text = "合計：${total}cal"
     }
 }
