@@ -15,22 +15,17 @@ class FoodAdapter(
 ) : RecyclerView.Adapter<FoodListViewHolder>() {
 
     private val inflater = LayoutInflater.from(context.context)
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FoodListViewHolder {
-        val view = inflater.inflate(R.layout.food_list_row,parent,false)
-        return FoodListViewHolder(view)
 
-
-    }
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FoodListViewHolder =
+        FoodListViewHolder(inflater.inflate(R.layout.food_list_row, parent, false))
 
     override fun getItemCount(): Int = list.size
 
-    override fun onBindViewHolder(holder: FoodListViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: FoodListViewHolder, position: Int) =
         list[position].let {
             holder.foodText.text = it.food
             holder.calText.text = it.absorption.toString()
         }
-    }
-
 }
 
 class FoodListViewHolder(view: View) : RecyclerView.ViewHolder(view) {
