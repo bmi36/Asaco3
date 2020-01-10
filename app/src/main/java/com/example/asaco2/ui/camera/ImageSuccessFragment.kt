@@ -48,20 +48,18 @@ class ImageSuccessFragment(
         cooknametext.setText(cook.foodname, TextView.BufferType.EDITABLE)
         caltext.setText(cook.calorie.toString(), TextView.BufferType.EDITABLE)
         okbutton.setOnClickListener {
+
+            val timeStamp =
+                SimpleDateFormat("yyyyMMddhhmmss").run { format(Date(System.currentTimeMillis())) }
+                    .toLong()
+
             CalendarEntity(
                 timeStamp, cook.foodname, 0, cook.calorie, 0
-            ).let {
-                viewModel.insert(it)
-            }
+            ).let { viewModel.insert(it) }
+
             Toast.makeText(activity, "完了しました", Toast.LENGTH_SHORT).show()
+
             activity?.finish()
         }
     }
-
-    private val timeStamp =
-        SimpleDateFormat("yyyyMMddhhmmss").let {
-            Date(System.currentTimeMillis()).let { data ->
-                it.format(data)
-            }
-        }.toLong()
 }
