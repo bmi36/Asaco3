@@ -55,7 +55,7 @@ class ImageSuccessFragment(
                 SimpleDateFormat("yyyyMMddhhmmss").run { format(Date(System.currentTimeMillis())) }
                     .toLong()
 
-            val pref = activity?.getSharedPreferences("User", Context.MODE_PRIVATE)
+            val pref = activity?.getSharedPreferences("Cock", Context.MODE_PRIVATE)
 
             val calory = pref?.let { it.getInt("calory", 0) + cook.calorie }?:0
 

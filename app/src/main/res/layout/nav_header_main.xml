@@ -50,9 +50,9 @@
                     tools:text="消費⇒125cal" />
             </LinearLayout>
 
-<!--            <Space-->
-<!--                android:layout_width="8dp"-->
-<!--                android:layout_height="match_parent" />-->
+            <Space
+                android:layout_width="8dp"
+                android:layout_height="match_parent" />
 
             <TextView
                 android:id="@+id/bmiText"

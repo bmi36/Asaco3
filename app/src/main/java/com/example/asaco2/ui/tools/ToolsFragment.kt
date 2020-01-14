@@ -3,14 +3,18 @@ package com.example.asaco2.ui.tools
 import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.RadioButton
 import android.widget.Toast
+import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import com.example.asaco2.R
 import com.google.android.material.navigation.NavigationView
+import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.activity_main.view.*
 import kotlinx.android.synthetic.main.fragment_tools.*
 import kotlinx.android.synthetic.main.nav_header_main.view.*
 
@@ -31,7 +35,7 @@ class ToolsFragment(
     ): View? =
         inflater.inflate(R.layout.fragment_tools, container, false)
 
-    @SuppressLint("SetTextI18n")
+    @SuppressLint("SetTextI18n", "WrongConstant")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -69,11 +73,15 @@ class ToolsFragment(
                 sex?.let {editor.putInt("sex",it.id) }
                 editor.putInt("bmr", bmr)
 
-                navView.UserName.text = str
-                navView.bmiText.text = "   BMI:$bmi"
-                editor.apply()
+                activity?.let {
+                    navView.UserName.text = str
+                    navView.bmiText.text = "BMI:$bmi"
+                }
 
-                (content as FinishBtn).onClick()
+                (content as FinishBtn).onClick().run {
+                    editor.apply()
+                    Toast.makeText(activity,"更新しました",Toast.LENGTH_SHORT).show()
+                }
 
             } catch (e: Exception) {
                 e.printStackTrace()

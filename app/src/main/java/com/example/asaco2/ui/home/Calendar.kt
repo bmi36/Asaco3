@@ -58,6 +58,8 @@ class Calendar : Fragment(), CoroutineScope {
                         ?.replace(include_frame.id, BottomSheetFragment(element,dayString))?.commit()
                     bottomsheetBehavior.state =
                         BottomSheetBehavior.STATE_HALF_EXPANDED
+                }else if (bottomsheetBehavior.state == BottomSheetBehavior.STATE_HALF_EXPANDED){
+                    bottomsheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
                 }
 
             }

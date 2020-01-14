@@ -46,7 +46,7 @@ import kotlin.coroutines.CoroutineContext
 
 const val CAMERA_REQUEST_CODE = 1
 const val CAMERA_PERMISSION_REQUEST_CODE = 2
-const val HUNTER = "HUNTER"
+const val HUNTER = "梅田ひろし"
 
 class MainActivity : AppCompatActivity(), CoroutineScope,ToolsFragment.FinishBtn {
 
@@ -61,11 +61,6 @@ class MainActivity : AppCompatActivity(), CoroutineScope,ToolsFragment.FinishBtn
                 R.id.nav_calendar, R.id.nav_gallery, R.id.nav_slideshow, R.id.nav_tools
             ), drawer_layout
         )
-    }
-
-
-    private val prefs: SharedPreferences by lazy {
-        getSharedPreferences("User", Context.MODE_PRIVATE)
     }
 
     //    ナビゲーションの初期化
@@ -99,7 +94,6 @@ class MainActivity : AppCompatActivity(), CoroutineScope,ToolsFragment.FinishBtn
             }
         }
     }
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -231,8 +225,6 @@ class MainActivity : AppCompatActivity(), CoroutineScope,ToolsFragment.FinishBtn
 
                 this.UserName.text = data.getString("name", HUNTER)
 
-                this.bmiText.text = "   BMI:${data?.getInt("bmi", 36)}"
-
                 navView.addHeaderView(this)
             }
         }
@@ -259,9 +251,15 @@ class MainActivity : AppCompatActivity(), CoroutineScope,ToolsFragment.FinishBtn
         }
     }
 
-    @SuppressLint("SetTextI18n")
+    private val event = DayilyEventController(0,0)
+    @SuppressLint("SetTextI18n", "CommitPrefEdits")
     override fun onStart() {
-        getSharedPreferences("User", Context.MODE_PRIVATE).run {
+        getSharedPreferences("Cock", Context.MODE_PRIVATE).run {
+            if (!event.isDoneDaily()){
+                this.edit().clear().apply()
+                event.execute()
+            }
+
             navView.getHeaderView(0).run {
                 Cal.text = "摂取⇒${getInt("calory", 0)}cal"
                 barn.text = "消費⇒${getInt("burn",0)}cal"
@@ -280,3 +278,5 @@ class MainActivity : AppCompatActivity(), CoroutineScope,ToolsFragment.FinishBtn
         action(Calendar())
     }
 }
+@SuppressLint("SimpleDateFormat")
+val today = SimpleDateFormat("MMdd").run{ format(Date(System.currentTimeMillis())) }.toInt()
