@@ -1,6 +1,5 @@
 package com.example.asaco2.ui.home
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -46,8 +45,7 @@ class Calendar : Fragment(), CoroutineScope {
             val strDay = if (dayOfMonth > 9) "$dayOfMonth" else "0${dayOfMonth}"
             val dayString = "${year}年${strMonth}月${strDay}日"
 
-            val id =
-                "$year$strMonth$strDay".toLong()
+            val id = "$year$strMonth$strDay".toLong()
 
             viewModel = activity?.run {
                 ViewModelProviders.of(this)[CalendarViewModel::class.java]
@@ -58,10 +56,10 @@ class Calendar : Fragment(), CoroutineScope {
                 if (element != null) {
                     if (element.isNotEmpty()) activity?.supportFragmentManager?.beginTransaction()
                         ?.replace(include_frame.id, BottomSheetFragment(element,dayString))?.commit()
-
+                    bottomsheetBehavior.state =
+                        BottomSheetBehavior.STATE_HALF_EXPANDED
                 }
-                bottomsheetBehavior.state =
-                    BottomSheetBehavior.STATE_HALF_EXPANDED
+
             }
         }
     }

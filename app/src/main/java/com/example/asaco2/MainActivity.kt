@@ -34,6 +34,7 @@ import com.example.asaco2.ui.tools.ToolsFragment
 import com.google.android.material.navigation.NavigationView
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.app_bar_main.*
+import kotlinx.android.synthetic.main.fragment_tools.view.*
 import kotlinx.android.synthetic.main.nav_header_main.view.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -47,7 +48,7 @@ const val CAMERA_REQUEST_CODE = 1
 const val CAMERA_PERMISSION_REQUEST_CODE = 2
 const val HUNTER = "HUNTER"
 
-class MainActivity : AppCompatActivity(), CoroutineScope {
+class MainActivity : AppCompatActivity(), CoroutineScope,ToolsFragment.FinishBtn {
 
     private lateinit var setFragment: Fragment
 
@@ -67,7 +68,7 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
         getSharedPreferences("User", Context.MODE_PRIVATE)
     }
 
-//    ナビゲーションの初期化
+    //    ナビゲーションの初期化
     private val navView: NavigationView by lazy {
         nav_view.apply {
             this.setNavigationItemSelectedListener {
@@ -91,7 +92,7 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
 
                     R.id.nav_tools -> {
                         toolbar.title = "設定"
-                        action(ToolsFragment(this@MainActivity,navView))
+                        action(ToolsFragment(this@MainActivity, navView))
                     }
                     else -> action(null)
                 }
@@ -223,16 +224,12 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
 
     //スライドメニューのへっだーのやつ
     @SuppressLint("SetTextI18n")
-     fun setHeader(navView: NavigationView) {
+    fun setHeader(navView: NavigationView) {
         getSharedPreferences("User", Context.MODE_PRIVATE).let { data ->
 
             LayoutInflater.from(this).inflate(R.layout.nav_header_main, navView, false).run {
 
                 this.UserName.text = data.getString("name", HUNTER)
-
-                this.Cal.text =
-                    "摂取⇒${data?.getInt("calory", 0)}" +
-                            "\n燃焼⇒${data?.getInt("barn", 0)}"
 
                 this.bmiText.text = "   BMI:${data?.getInt("bmi", 36)}"
 
@@ -242,7 +239,7 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
     }
 
 
-//画像をDBに保存するやつ
+    //画像をDBに保存するやつ
     private fun registerDatabase(file: File) {
         val contentValues = ContentValues().also {
             it.put(MediaStore.Images.Media.MIME_TYPE, "image/jpg")
@@ -251,18 +248,35 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
         this.contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
     }
 
-//バックボタンを押したときのやつ
+    //バックボタンを押したときのやつ
     override fun onBackPressed() {
         when (navView.checkedItem?.itemId) {
             R.id.nav_calendar -> super.onBackPressed()
             else -> {
-                title = "カレンダー画面"
-                navView.setCheckedItem(R.id.nav_calendar)
-                action(Calendar())
+                onClick()
+
             }
         }
     }
 
+    @SuppressLint("SetTextI18n")
+    override fun onStart() {
+        getSharedPreferences("User", Context.MODE_PRIVATE).run {
+            navView.getHeaderView(0).run {
+                Cal.text = "摂取⇒${getInt("calory", 0)}cal"
+                barn.text = "消費⇒${getInt("burn",0)}cal"
+            }
+        }
+
+        super.onStart()
+    }
+
     override val coroutineContext: CoroutineContext
         get() = Job()
+
+    override fun onClick() {
+        toolbar.title = "カレンダー画面"
+        navView.setCheckedItem(R.id.nav_calendar)
+        action(Calendar())
+    }
 }

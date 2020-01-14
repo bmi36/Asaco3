@@ -29,5 +29,12 @@
     <string name="bottom_sheet_dialog">Bottom Sheet Dialog</string>
     <string name="bottom_sheet">Bottom Sheet</string>
     <string name="let_s_join_our_community_on_slack2">Let\'s Join our Community on Slack</string>
+    <string name="instance_nowtext">○○○○年○○月○○日</string>
+    <string name="nemu">・メニュー</string>
+    <string name="walkText">・歩数</string>
+    <string name="weight_kg">体重(kg)：</string>
+    <string name="age">年齢：</string>
+    <string name="mail">男</string>
+    <string name="famail">女</string>
 
 </resources>

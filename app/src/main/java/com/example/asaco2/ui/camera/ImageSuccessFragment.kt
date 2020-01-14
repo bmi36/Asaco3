@@ -1,5 +1,7 @@
 package com.example.asaco2.ui.camera
 
+import android.annotation.SuppressLint
+import android.content.Context
 import android.icu.text.SimpleDateFormat
 import android.net.Uri
 import android.os.Bundle
@@ -52,6 +54,12 @@ class ImageSuccessFragment(
             val timeStamp =
                 SimpleDateFormat("yyyyMMddhhmmss").run { format(Date(System.currentTimeMillis())) }
                     .toLong()
+
+            val pref = activity?.getSharedPreferences("User", Context.MODE_PRIVATE)
+
+            val calory = pref?.let { it.getInt("calory", 0) + cook.calorie }?:0
+
+            pref?.edit()?.putInt("calory",calory)?.apply()
 
             CalendarEntity(
                 timeStamp, cook.foodname, 0, cook.calorie, 0
