@@ -13,6 +13,7 @@ import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
 import android.view.LayoutInflater
+import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
@@ -280,3 +281,11 @@ class MainActivity : AppCompatActivity(), CoroutineScope,ToolsFragment.FinishBtn
 }
 @SuppressLint("SimpleDateFormat")
 val today = SimpleDateFormat("MMdd").run{ format(Date(System.currentTimeMillis())) }.toInt()
+
+fun hideKeyboard(activity: Activity) {
+    val view = activity.currentFocus
+    if (view != null) {
+        val manager = activity.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        manager.hideSoftInputFromWindow(view.windowToken, 0)
+    }
+}

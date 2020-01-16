@@ -14,14 +14,9 @@ data class CalendarEntity(
     @ColumnInfo(name = "entity_food")
     var food: String?,
 
-    @ColumnInfo(name= "entity_burned")
-    var burned: Int?,
 
     @ColumnInfo(name = "entity_absorption")
-    var absorption: Int?,
-
-    @ColumnInfo(name = "entity_step")
-    var step: Int?
+    var absorption: Int?
 
 
 ):Serializable

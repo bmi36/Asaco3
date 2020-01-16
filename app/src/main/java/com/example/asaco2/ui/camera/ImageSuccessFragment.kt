@@ -1,11 +1,9 @@
 package com.example.asaco2.ui.camera
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.icu.text.SimpleDateFormat
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,13 +11,10 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProviders
-import com.example.asaco2.MainActivity
 import com.example.asaco2.R
 import com.example.asaco2.ui.home.CalendarEntity
 import com.example.asaco2.ui.home.CalendarViewModel
 import kotlinx.android.synthetic.main.image_success_fragment.*
-import java.io.DataInputStream
-import java.lang.String.format
 import java.util.*
 
 class ImageSuccessFragment(
@@ -52,19 +47,20 @@ class ImageSuccessFragment(
         okbutton.setOnClickListener {
 
             val timeStamp =
-                SimpleDateFormat("yyyyMMddhhmmss").run { format(Date(System.currentTimeMillis())) }
-                    .toLong()
+                SimpleDateFormat("yyyyMMddhhmmss").run { format(Date(System.currentTimeMillis())) }.toLong()
 
-            val pref = activity?.getSharedPreferences("Cock", Context.MODE_PRIVATE)
+            val pref = activity?.run {
+                getSharedPreferences("Cock", Context.MODE_PRIVATE)
+            }
 
-            val calory = pref?.let { it.getInt("calory", 0) + cook.calorie }?:0
+            val calorie = pref?.let { it.getInt("calory", 0) + cook.calorie }?:0
 
-            pref?.edit()?.putInt("calory",calory)?.apply()
+            pref?.edit()?.putInt("calory",calorie)?.apply()
 
-            CalendarEntity(
-                timeStamp, cook.foodname, 0, cook.calorie, 0
-            ).let { viewModel.insert(it) }
+            val cookStr = cooknametext.text.toString()
+            val calorieStr = caltext.text.toString().toInt()
 
+            CalendarEntity(timeStamp, cookStr, calorieStr).let { viewModel.insert(it) }
             Toast.makeText(activity, "完了しました", Toast.LENGTH_SHORT).show()
 
             activity?.finish()
