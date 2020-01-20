@@ -22,3 +22,17 @@ import androidx.sqlite.db.SupportSQLiteDatabase
                 }
     }
 }
+
+@Database(entities = [Step::class],version = 1)
+abstract class StepDataBase: RoomDatabase(){
+    abstract fun dao(): StepDao
+
+    companion object{
+        @Volatile
+        private var instance: StepDataBase? = null
+        fun getInstance(context: Context): StepDataBase = instance ?:
+                synchronized(this){
+                    Room.databaseBuilder(context,StepDataBase::class.java,"step_db").build()
+                }
+    }
+}

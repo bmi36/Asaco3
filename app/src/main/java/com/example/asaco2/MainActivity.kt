@@ -8,13 +8,16 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
+import android.hardware.Sensor
+import android.hardware.SensorEvent
+import android.hardware.SensorEventListener
+import android.hardware.SensorManager
 import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
 import android.view.LayoutInflater
 import android.view.inputmethod.InputMethodManager
-import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -29,16 +32,16 @@ import androidx.navigation.ui.navigateUp
 import com.example.asaco2.ui.camera.CameraResult
 import com.example.asaco2.ui.gallery.GalleryFragment
 import com.example.asaco2.ui.home.Calendar
-import com.example.asaco2.ui.home.CalendarEntity
-import com.example.asaco2.ui.home.CalendarViewModel
+import com.example.asaco2.ui.home.Step
+import com.example.asaco2.ui.home.StepViewModel
 import com.example.asaco2.ui.tools.ToolsFragment
 import com.google.android.material.navigation.NavigationView
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.app_bar_main.*
-import kotlinx.android.synthetic.main.fragment_tools.view.*
 import kotlinx.android.synthetic.main.nav_header_main.view.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
@@ -49,18 +52,20 @@ const val CAMERA_REQUEST_CODE = 1
 const val CAMERA_PERMISSION_REQUEST_CODE = 2
 const val HUNTER = "梅田ひろし"
 
-class MainActivity : AppCompatActivity(), CoroutineScope,ToolsFragment.FinishBtn {
+class MainActivity : AppCompatActivity(), CoroutineScope, ToolsFragment.FinishBtn,
+    SensorEventListener {
 
     private lateinit var setFragment: Fragment
-
-    // Passing each menu ID as a set of Ids because each
-    // menu should be considered as top level destinations.
+    private var mSensorManager: SensorManager? = null
+    private var mStepCounterSensor: Sensor? = null
+    private var mStepDetectorSensor: Sensor? = null
+    private lateinit var prefs: SharedPreferences
+    private var stepcount = 0
 
     private val appBarConfiguration: AppBarConfiguration by lazy {
         AppBarConfiguration(
-            setOf(
-                R.id.nav_calendar, R.id.nav_gallery, R.id.nav_slideshow, R.id.nav_tools
-            ), drawer_layout
+            setOf(R.id.nav_calendar, R.id.nav_gallery, R.id.nav_slideshow, R.id.nav_tools),
+            drawer_layout
         )
     }
 
@@ -83,7 +88,7 @@ class MainActivity : AppCompatActivity(), CoroutineScope,ToolsFragment.FinishBtn
 
                     R.id.nav_gallery -> {
                         toolbar.title = "徒歩"
-                        action(GalleryFragment())
+                        action(GalleryFragment(stepcount))
                     }
 
                     R.id.nav_tools -> {
@@ -99,6 +104,11 @@ class MainActivity : AppCompatActivity(), CoroutineScope,ToolsFragment.FinishBtn
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        launch {
+            mSensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
+            mStepCounterSensor = mSensorManager?.getDefaultSensor(Sensor.TYPE_STEP_COUNTER)
+        }
 
         title = "カレンダー画面"
 
@@ -121,7 +131,7 @@ class MainActivity : AppCompatActivity(), CoroutineScope,ToolsFragment.FinishBtn
             drawer_layout.addDrawerListener(it)
             it.syncState()
         }
-
+        prefs = getSharedPreferences("Cock", Context.MODE_PRIVATE)
         setFragment = Calendar()
         setHeader(navView)
         navView.setCheckedItem(R.id.nav_calendar)
@@ -252,18 +262,19 @@ class MainActivity : AppCompatActivity(), CoroutineScope,ToolsFragment.FinishBtn
         }
     }
 
-    private val event = DayilyEventController(0,0)
+    private val dayFlg = DayilyEventController(0, 0)
+
     @SuppressLint("SetTextI18n", "CommitPrefEdits")
     override fun onStart() {
         getSharedPreferences("Cock", Context.MODE_PRIVATE).run {
-            if (!event.isDoneDaily()){
+            if (!dayFlg.isDoneDaily()) {
                 this.edit().clear().apply()
-                event.execute()
+                dayFlg.execute()
             }
 
             navView.getHeaderView(0).run {
                 Cal.text = "摂取⇒${getInt("calory", 0)}cal"
-                barn.text = "消費⇒${getInt("burn",0)}cal"
+                barn.text = "消費⇒${getInt("burn", 0)}cal"
             }
         }
 
@@ -278,9 +289,34 @@ class MainActivity : AppCompatActivity(), CoroutineScope,ToolsFragment.FinishBtn
         navView.setCheckedItem(R.id.nav_calendar)
         action(Calendar())
     }
+
+    override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {}
+
+    override fun onSensorChanged(event: SensorEvent?) {
+        event?.values?.let {
+            if (event.sensor.type == Sensor.TYPE_STEP_COUNTER) {
+                stepcount++
+            }
+        }
+        if (!dayFlg.isDoneDaily()) {
+            stepcount = 0
+            prefs.edit().clear().apply()
+        }
+    }
+
+    override fun onResume() {
+        mSensorManager?.registerListener(this, mStepCounterSensor, SensorManager.SENSOR_DELAY_NORMAL)
+        super.onResume()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        mSensorManager?.unregisterListener(this, mStepCounterSensor)
+    }
 }
+
 @SuppressLint("SimpleDateFormat")
-val today = SimpleDateFormat("yyyy年MM月dd日").run{ format(Date(System.currentTimeMillis())) }
+val today: String = SimpleDateFormat("yyyy年MM月dd日").run { format(Date(System.currentTimeMillis())) }
 
 fun hideKeyboard(activity: Activity) {
     val view = activity.currentFocus

@@ -3,34 +3,55 @@ package com.example.asaco2.ui.home
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import java.sql.SQLException
 
-class CalendarViewModel(application: Application):AndroidViewModel(application) {
+class CalendarViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val repository: Repository
-    val allCalendar: LiveData<Array<CalendarEntity>>
-    lateinit var SelectCalendar: LiveData<CalendarEntity>
+    private val calendarRepository: CalendarRepository
+    private val allCalendar: LiveData<Array<CalendarEntity>>
     private var repoDao: CalendarDao = CalendarDatabase.getInstance(application).calendarDao()
 
     init {
-        repository = Repository(repoDao)
-            allCalendar = repository.allEntity
+        calendarRepository = CalendarRepository(repoDao)
+        allCalendar = calendarRepository.allEntity
     }
 
-    fun insert(entity: CalendarEntity) = viewModelScope.launch { repository.insert(entity) }
+    fun insert(entity: CalendarEntity) = viewModelScope.launch { calendarRepository.insert(entity) }
 
-    fun update(entity: CalendarEntity) = viewModelScope.launch { repository.update(entity) }
+    fun update(entity: CalendarEntity) = viewModelScope.launch { calendarRepository.update(entity) }
 
     fun InsertOrUpdata(entity: CalendarEntity) = viewModelScope.launch {
         try {
-            repository.insert(entity)
-        }catch (e:SQLException){
+            calendarRepository.insert(entity)
+        } catch (e: SQLException) {
             e.printStackTrace()
-            repository.update(entity)
+            calendarRepository.update(entity)
         }
     }
-    fun getCalendar(id: Long): List<CalendarEntity>? = repository.getCalendar(id)
+
+    fun getCalendar(id: Long): List<CalendarEntity>? = calendarRepository.getCalendar(id)
+}
+
+class StepViewModel(application: Application, date: Long) : ViewModel() {
+    private val stepRepository: StepRepository
+
+    private var repoDao: StepDao = StepDataBase.getInstance(application).dao()
+
+    init {
+        stepRepository = StepRepository(repoDao, date)
+    }
+
+    fun insert(step: Step) = viewModelScope.launch { repoDao.insert(step) }
+    fun update(step: Step) = viewModelScope.launch { repoDao.update(step) }
+    fun InsertOrUpdata(entity: Step) = viewModelScope.launch {
+        try {
+            stepRepository.insert(entity)
+        } catch (e: SQLException) {
+            e.printStackTrace()
+            stepRepository.update(entity)
+        }
+    }
 }

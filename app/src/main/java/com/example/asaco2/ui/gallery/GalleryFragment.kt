@@ -9,7 +9,7 @@ import com.example.asaco2.R
 import com.example.asaco2.today
 import kotlinx.android.synthetic.main.fragment_gallery.*
 
-class GalleryFragment : Fragment() {
+class GalleryFragment(val step: Int) : Fragment() {
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -22,7 +22,7 @@ class GalleryFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        dayText.text = today.toString()
+        dayText.text = today
         childFragmentManager.beginTransaction().add(frame.id,GraphFragment()).commitNow()
     }
 }

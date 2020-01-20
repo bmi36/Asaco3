@@ -10,10 +10,10 @@ import androidx.room.Update
 interface CalendarDao {
 
     //💩
-    @Query("select * from Entity")
+    @Query("select * from CalendarEntity")
     fun getEntity(): LiveData<Array<CalendarEntity>>
 
-    @Query("select * from Entity where id like :id || '%'")
+    @Query("select * from CalendarEntity where id like :id || '%'")
     fun getEntity(id: Long): List<CalendarEntity>?
 
     //リストに追加
@@ -25,4 +25,17 @@ interface CalendarDao {
     suspend fun update(entity: CalendarEntity)
 
 
+}
+
+@Dao
+interface StepDao{
+
+    @Query("select * from StepEntity where id like :date || '%'")
+    fun getEntity(date: Long): LiveData<Array<Step>>
+
+    @Insert
+    suspend fun insert(entity: Step)
+
+    @Update
+    suspend fun update(entity: Step)
 }

@@ -5,7 +5,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import java.io.Serializable
 
-@Entity(tableName = "Entity")
+@Entity(tableName = "CalendarEntity")
 data class CalendarEntity(
 
     @PrimaryKey
@@ -20,4 +20,13 @@ data class CalendarEntity(
 
 
 ):Serializable
+
+
+@Entity(tableName = "StepEntity")
+data class Step(
+    @PrimaryKey
+    val id: Long,
+    @ColumnInfo(name = "entity_step")
+    val step: Int
+)
 
