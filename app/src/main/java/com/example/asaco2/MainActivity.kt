@@ -280,7 +280,7 @@ class MainActivity : AppCompatActivity(), CoroutineScope,ToolsFragment.FinishBtn
     }
 }
 @SuppressLint("SimpleDateFormat")
-val today = SimpleDateFormat("MMdd").run{ format(Date(System.currentTimeMillis())) }.toInt()
+val today = SimpleDateFormat("yyyy年MM月dd日").run{ format(Date(System.currentTimeMillis())) }
 
 fun hideKeyboard(activity: Activity) {
     val view = activity.currentFocus

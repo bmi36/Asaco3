@@ -28,6 +28,10 @@ android {
     }
 }
 
+repositories {
+    maven { url "https://jitpack.io" }
+}
+
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
@@ -68,4 +72,7 @@ dependencies {
     //Kotlin coroutines用ライブラリ(async, await)
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutines_version"
     //Kotlin coroutines用ライブラリ(async, await)
+
+//    グラフ用のライブラリのやつ
+    implementation'com.github.PhilJay:MPAndroidChart:v2.1.6'
 }

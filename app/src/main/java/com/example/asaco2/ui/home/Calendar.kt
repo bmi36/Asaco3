@@ -51,14 +51,23 @@ class Calendar : Fragment(), CoroutineScope {
                 ViewModelProviders.of(this)[CalendarViewModel::class.java]
             } ?: throw Exception("Invalid Activity")
 
+
+
             launch {
                 val element = viewModel.getCalendar(id)
                 if (element != null) {
-                    if (element.isNotEmpty()) activity?.supportFragmentManager?.beginTransaction()
-                        ?.replace(include_frame.id, BottomSheetFragment(element,dayString))?.commit()
-                    bottomsheetBehavior.state =
-                        BottomSheetBehavior.STATE_HALF_EXPANDED
-                }else if (bottomsheetBehavior.state == BottomSheetBehavior.STATE_HALF_EXPANDED){
+                    if (element.isNotEmpty()) {
+                        activity?.run {
+                            supportFragmentManager.beginTransaction()
+                                .replace(include_frame.id, BottomSheetFragment(element, dayString))
+                                .commit()
+                        }
+
+                        bottomsheetBehavior.state =
+                            BottomSheetBehavior.STATE_EXPANDED
+                    }
+
+                } else if (bottomsheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED) {
                     bottomsheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
                 }
 

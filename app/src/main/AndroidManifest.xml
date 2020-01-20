@@ -17,9 +17,6 @@
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
         <activity android:name=".ui.camera.CameraResult" />
-        <activity android:name=".ui.home.MemoNullActivity" />
-        <activity android:name=".CameraActivity" />
-        <activity android:name=".ui.home.Memo" />
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name"
