@@ -15,70 +15,13 @@
         android:background="@android:color/white"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/constraintLayoutToday">
+        app:layout_constraintTop_toBottomOf="@+id/include_walk_statu">
 
     </FrameLayout>
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/constraintLayoutToday"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:background="#99CCFF"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
-
-
-            <TextView
-                android:id="@+id/dayText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="8dp"
-                android:text="@string/instance_nowtext"
-                android:textAppearance="@style/TextAppearance.AppCompat.Large"
-                android:textColor="@android:color/black"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <include
-                android:id="@+id/include_today_hosuu"
-                layout="@layout/module_hosuu"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="24dp"
-                android:layout_marginEnd="32dp"
-                android:layout_marginBottom="32dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/include_today_distance"
-                app:layout_constraintHorizontal_bias="0.42"
-                app:layout_constraintStart_toStartOf="@+id/dayText"
-                app:layout_constraintTop_toBottomOf="@+id/dayText" />
-
-            <include
-                android:id="@+id/include_today_calory"
-                layout="@layout/module_calory"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="@android:dimen/app_icon_size"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/include_today_hosuu" />
-
-            <include
-                android:id="@+id/include_today_distance"
-                layout="@layout/module_distance"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:layout_marginBottom="32dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="@+id/include_today_calory"
-                app:layout_constraintHorizontal_bias="0.0"
-                app:layout_constraintStart_toStartOf="@+id/include_today_calory"
-                app:layout_constraintTop_toBottomOf="@+id/include_today_calory" />
-        </androidx.constraintlayout.widget.ConstraintLayout>
+    <include layout="@layout/walk_statu_layout" android:id="@+id/include_walk_statu"/>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

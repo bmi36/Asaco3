@@ -18,6 +18,7 @@ import android.os.Environment
 import android.provider.MediaStore
 import android.view.LayoutInflater
 import android.view.inputmethod.InputMethodManager
+import androidx.activity.viewModels
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -58,9 +59,10 @@ class MainActivity : AppCompatActivity(), CoroutineScope, ToolsFragment.FinishBt
     private lateinit var setFragment: Fragment
     private var mSensorManager: SensorManager? = null
     private var mStepCounterSensor: Sensor? = null
-    private var mStepDetectorSensor: Sensor? = null
     private lateinit var prefs: SharedPreferences
     private var stepcount = 0
+
+    private val viewModel: StepViewModel by viewModels()
 
     private val appBarConfiguration: AppBarConfiguration by lazy {
         AppBarConfiguration(
@@ -103,13 +105,13 @@ class MainActivity : AppCompatActivity(), CoroutineScope, ToolsFragment.FinishBt
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setTheme(R.style.AppTheme_NoActionBar)
         setContentView(R.layout.activity_main)
 
         launch {
             mSensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
             mStepCounterSensor = mSensorManager?.getDefaultSensor(Sensor.TYPE_STEP_COUNTER)
         }
-
         title = "カレンダー画面"
 
         setSupportActionBar(toolbar)
@@ -299,6 +301,7 @@ class MainActivity : AppCompatActivity(), CoroutineScope, ToolsFragment.FinishBt
             }
         }
         if (!dayFlg.isDoneDaily()) {
+            viewModel.insert(Step(day.toLong(),stepcount))
             stepcount = 0
             prefs.edit().clear().apply()
         }
@@ -317,6 +320,8 @@ class MainActivity : AppCompatActivity(), CoroutineScope, ToolsFragment.FinishBt
 
 @SuppressLint("SimpleDateFormat")
 val today: String = SimpleDateFormat("yyyy年MM月dd日").run { format(Date(System.currentTimeMillis())) }
+
+val day = SimpleDateFormat("yyyyMMdd").run { format(Date(System.currentTimeMillis())) }
 
 fun hideKeyboard(activity: Activity) {
     val view = activity.currentFocus

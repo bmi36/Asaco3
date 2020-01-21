@@ -31,7 +31,7 @@ interface CalendarDao {
 interface StepDao{
 
     @Query("select * from StepEntity where id like :date || '%'")
-    fun getEntity(date: Long): LiveData<Array<Step>>
+    fun getEntity(date: Long): Array<Step>
 
     @Insert
     suspend fun insert(entity: Step)
