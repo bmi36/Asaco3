@@ -5,6 +5,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
+import kotlinx.coroutines.selects.select
 
 @Dao
 interface CalendarDao {
@@ -38,4 +39,7 @@ interface StepDao{
 
     @Update
     suspend fun update(entity: Step)
+
+    @Query("select sum(entity_step) from StepEntity where id like :date||'%'")
+    fun getstep(date: Long): Int
 }

@@ -51,7 +51,6 @@ import kotlin.coroutines.CoroutineContext
 
 
 const val CAMERA_REQUEST_CODE = 1
-const val CAMERA_PERMISSION_REQUEST_CODE = 2
 const val HUNTER = "梅田ひろし"
 
 
@@ -70,6 +69,7 @@ class MainActivity : AppCompatActivity(), CoroutineScope, ToolsFragment.FinishBt
     private lateinit var permissions: Array<String>
     private var sensorcount: Int = 0
     private lateinit var viewModel: StepViewModel
+    private var flg = false
 
     private val appBarConfiguration: AppBarConfiguration by lazy {
         AppBarConfiguration(
@@ -84,7 +84,8 @@ class MainActivity : AppCompatActivity(), CoroutineScope, ToolsFragment.FinishBt
             this.setNavigationItemSelectedListener {
                 when (it.itemId) {
                     R.id.nav_slideshow -> {
-                        action(null)
+                        if (flg) takePicture()
+//                        action(null)
 
                         true
                     }
@@ -134,9 +135,8 @@ class MainActivity : AppCompatActivity(), CoroutineScope, ToolsFragment.FinishBt
 
         fab.setOnClickListener {
             //カメラボタンが押されたときになんかするやつ
-            checkPermission(permissions, REQUEST_CODE)
+            if (flg) takePicture()
             drawer_layout.closeDrawer(GravityCompat.START)
-            takePicture()
 
         }
         viewModel = ViewModelProviders.of(this)[StepViewModel::class.java]
@@ -189,6 +189,7 @@ class MainActivity : AppCompatActivity(), CoroutineScope, ToolsFragment.FinishBt
 //        takePicture()
     }
 
+    //    パーミッションのリクエストとかのそうゆうやつ
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<String>,
@@ -196,15 +197,13 @@ class MainActivity : AppCompatActivity(), CoroutineScope, ToolsFragment.FinishBt
     ) {
         when (requestCode) {
             REQUEST_CODE -> for (index in permissions.indices) {
-                if (grantResults[index] == PackageManager.PERMISSION_GRANTED)
-                else Toast.makeText(
-                    this,
-                    "Rejected Permission:${permissions[index]}",
-                    Toast.LENGTH_SHORT
-                ).show()
+                if (grantResults[index] == PackageManager.PERMISSION_GRANTED) flg = true
+                else {
+                    flg = false
+                    break
+                }
             }
         }
-
     }
 
     //写真を撮った後のやつ
@@ -325,6 +324,7 @@ class MainActivity : AppCompatActivity(), CoroutineScope, ToolsFragment.FinishBt
         mSensorManager?.unregisterListener(this, mStepCounterSensor)
     }
 }
+
 @SuppressLint("SimpleDateFormat")
 val today: String = SimpleDateFormat("yyyy年MM月dd日").run { format(Date(System.currentTimeMillis())) }
 

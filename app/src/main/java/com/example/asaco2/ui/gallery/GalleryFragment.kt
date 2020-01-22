@@ -8,6 +8,7 @@ import androidx.fragment.app.Fragment
 import com.example.asaco2.R
 import com.example.asaco2.today
 import kotlinx.android.synthetic.main.fragment_gallery.*
+import kotlinx.android.synthetic.main.nav_header_main.*
 import kotlinx.android.synthetic.main.walk_statu_layout.*
 import java.text.SimpleDateFormat
 import java.util.*
@@ -28,17 +29,21 @@ class GalleryFragment(private val step: Int) : Fragment() {
         dayText.text = today
 
         dayBtn.setOnClickListener { childFragmentManager.beginTransaction().replace(frame.id, GraphFragment(
-            day.toLong()
+            day.toLong(),daylast
         )).commit() }
         monthBtn.setOnClickListener { childFragmentManager.beginTransaction().replace(frame.id, GraphFragment(
-            month.toLong()
+            month.toLong(),12
         )).commit() }
         yearBtn.setOnClickListener { childFragmentManager.beginTransaction().replace(frame.id, GraphFragment(
-            year.toLong()
+            year.toLong(),0
         )).commit() }
     }
 
     val day: String = SimpleDateFormat("yyyyMMdd").let { it.format(Date(System.currentTimeMillis())) }
     val month: String = SimpleDateFormat("yyyyMM").run { format(Date(System.currentTimeMillis())) }
     val year: String = SimpleDateFormat("yyyy").run { format(Date(System.currentTimeMillis())) }
+    val daylast = Calendar.getInstance().let {
+        it.set(Calendar.MONTH,1)
+        it.getActualMaximum(Calendar.DATE)
+    }
 }

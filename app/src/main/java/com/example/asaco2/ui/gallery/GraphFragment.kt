@@ -17,7 +17,7 @@ import kotlinx.android.synthetic.main.graph_fragment.*
 import kotlinx.coroutines.*
 import kotlin.coroutines.CoroutineContext
 
-class GraphFragment(private val date: Long) : Fragment(), CoroutineScope {
+class GraphFragment(private val date: Long, private val type: Int) : Fragment(), CoroutineScope {
 
     private lateinit var viewModel: StepViewModel
 
@@ -41,11 +41,20 @@ class GraphFragment(private val date: Long) : Fragment(), CoroutineScope {
             list = viewModel.getstep(date)
 
             var barChar: ArrayList<BarEntry>? = null
+
             var listname: ArrayList<String>? = null
 
             for (element in list) {
                 barChar = arrayListOf(BarEntry(element.step.toFloat(), element.id.toInt()))
                 listname = arrayListOf(element.id.toString())
+            }
+
+            if (list.size < type){
+                val differnce = type - list.size
+                for (index in 0..differnce){
+                    barChar = arrayListOf(BarEntry(0f,12))
+                    listname = arrayListOf("次のやつ")
+                }
             }
 
             if (barChar != null) {
@@ -56,10 +65,10 @@ class GraphFragment(private val date: Long) : Fragment(), CoroutineScope {
                 chart.run {
                     data = barData
                     barDataSet.setColors(ColorTemplate.COLORFUL_COLORS)
-                    animateY(2500)
                 }
             }
         }
+        chart.animateY(2500)
     }
 
     override val coroutineContext: CoroutineContext
