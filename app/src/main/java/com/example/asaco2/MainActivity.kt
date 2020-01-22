@@ -62,7 +62,7 @@ class MainActivity : AppCompatActivity(), CoroutineScope, ToolsFragment.FinishBt
     private lateinit var prefs: SharedPreferences
     private var stepcount = 0
 
-    private val viewModel: StepViewModel by viewModels()
+    private lateinit var viewModel: StepViewModel
 
     private val appBarConfiguration: AppBarConfiguration by lazy {
         AppBarConfiguration(
@@ -121,7 +121,7 @@ class MainActivity : AppCompatActivity(), CoroutineScope, ToolsFragment.FinishBt
             drawer_layout.closeDrawer(GravityCompat.START)
             checkPermission()
         }
-
+        viewModel = ViewModelProviders.of(this)[StepViewModel::class.java]
         //どろわーの設定
         ActionBarDrawerToggle(
             this,
@@ -268,12 +268,7 @@ class MainActivity : AppCompatActivity(), CoroutineScope, ToolsFragment.FinishBt
 
     @SuppressLint("SetTextI18n", "CommitPrefEdits")
     override fun onStart() {
-        getSharedPreferences("Cock", Context.MODE_PRIVATE).run {
-            if (!dayFlg.isDoneDaily()) {
-                this.edit().clear().apply()
-                dayFlg.execute()
-            }
-
+        prefs.run {
             navView.getHeaderView(0).run {
                 Cal.text = "摂取⇒${getInt("calory", 0)}cal"
                 barn.text = "消費⇒${getInt("burn", 0)}cal"
@@ -300,20 +295,22 @@ class MainActivity : AppCompatActivity(), CoroutineScope, ToolsFragment.FinishBt
                 stepcount++
             }
         }
-        if (!dayFlg.isDoneDaily()) {
-            viewModel.insert(Step(day.toLong(),stepcount))
-            stepcount = 0
-            prefs.edit().clear().apply()
-        }
     }
 
     override fun onResume() {
-        mSensorManager?.registerListener(this, mStepCounterSensor, SensorManager.SENSOR_DELAY_NORMAL)
         super.onResume()
+        mSensorManager
+            ?.registerListener(this, mStepCounterSensor, SensorManager.SENSOR_DELAY_NORMAL)
     }
 
     override fun onStop() {
         super.onStop()
+        prefs.edit().putInt("walk", stepcount).apply()
+        if (!dayFlg.isDoneDaily()) {
+            viewModel.insert(Step(day.toLong(), stepcount))
+            stepcount = 0
+            prefs.edit().clear().apply()
+        }
         mSensorManager?.unregisterListener(this, mStepCounterSensor)
     }
 }
