@@ -13,12 +13,13 @@ import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
 import android.view.LayoutInflater
 import android.view.inputmethod.InputMethodManager
-import androidx.activity.viewModels
+import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -53,15 +54,21 @@ const val CAMERA_REQUEST_CODE = 1
 const val CAMERA_PERMISSION_REQUEST_CODE = 2
 const val HUNTER = "梅田ひろし"
 
+
 class MainActivity : AppCompatActivity(), CoroutineScope, ToolsFragment.FinishBtn,
     SensorEventListener {
+
+    companion object {
+        private const val REQUEST_CODE = 1000
+    }
 
     private lateinit var setFragment: Fragment
     private var mSensorManager: SensorManager? = null
     private var mStepCounterSensor: Sensor? = null
     private lateinit var prefs: SharedPreferences
     private var stepcount = 0
-
+    private lateinit var permissions: Array<String>
+    private var sensorcount: Int = 0
     private lateinit var viewModel: StepViewModel
 
     private val appBarConfiguration: AppBarConfiguration by lazy {
@@ -78,7 +85,6 @@ class MainActivity : AppCompatActivity(), CoroutineScope, ToolsFragment.FinishBt
                 when (it.itemId) {
                     R.id.nav_slideshow -> {
                         action(null)
-                        checkPermission()
 
                         true
                     }
@@ -108,6 +114,12 @@ class MainActivity : AppCompatActivity(), CoroutineScope, ToolsFragment.FinishBt
         setTheme(R.style.AppTheme_NoActionBar)
         setContentView(R.layout.activity_main)
 
+        if (Build.VERSION.SDK_INT >= 23) {
+            permissions =
+                arrayOf(Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+        }
+        checkPermission(permissions, REQUEST_CODE)
+
         launch {
             mSensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
             mStepCounterSensor = mSensorManager?.getDefaultSensor(Sensor.TYPE_STEP_COUNTER)
@@ -116,10 +128,16 @@ class MainActivity : AppCompatActivity(), CoroutineScope, ToolsFragment.FinishBt
 
         setSupportActionBar(toolbar)
 
+        prefs = getSharedPreferences("Cock", Context.MODE_PRIVATE)
+
+        prefs.getInt("sensor", 0)
+
         fab.setOnClickListener {
             //カメラボタンが押されたときになんかするやつ
+            checkPermission(permissions, REQUEST_CODE)
             drawer_layout.closeDrawer(GravityCompat.START)
-            checkPermission()
+            takePicture()
+
         }
         viewModel = ViewModelProviders.of(this)[StepViewModel::class.java]
         //どろわーの設定
@@ -133,7 +151,6 @@ class MainActivity : AppCompatActivity(), CoroutineScope, ToolsFragment.FinishBt
             drawer_layout.addDrawerListener(it)
             it.syncState()
         }
-        prefs = getSharedPreferences("Cock", Context.MODE_PRIVATE)
         setFragment = Calendar()
         setHeader(navView)
         navView.setCheckedItem(R.id.nav_calendar)
@@ -166,40 +183,28 @@ class MainActivity : AppCompatActivity(), CoroutineScope, ToolsFragment.FinishBt
             }
     }
 
-    //ぱーにっしょんをリクエストするやつ
-    private fun requestPermission() {
-        val str: Array<String> = arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-
-        if (ActivityCompat.shouldShowRequestPermissionRationale(
-                this,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE
-            )
-        ) {
-            ActivityCompat.requestPermissions(this, str, CAMERA_PERMISSION_REQUEST_CODE)
-        }
-    }
-
     //ぱーにっしょん確認するやつ
-    private fun checkPermission() {
-        if (ActivityCompat.checkSelfPermission(
-                this,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE
-            )
-            == PackageManager.PERMISSION_GRANTED
-        ) takePicture() else requestPermission()
+    private fun checkPermission(permissions: Array<String>, request_code: Int) {
+        ActivityCompat.requestPermissions(this, permissions, request_code)
+//        takePicture()
     }
-
 
     override fun onRequestPermissionsResult(
         requestCode: Int,
-        permissions: Array<out String>,
+        permissions: Array<String>,
         grantResults: IntArray
     ) {
-        if (requestCode == CAMERA_PERMISSION_REQUEST_CODE) {
-            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                takePicture()
+        when (requestCode) {
+            REQUEST_CODE -> for (index in permissions.indices) {
+                if (grantResults[index] == PackageManager.PERMISSION_GRANTED)
+                else Toast.makeText(
+                    this,
+                    "Rejected Permission:${permissions[index]}",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
+
     }
 
     //写真を撮った後のやつ
@@ -268,7 +273,7 @@ class MainActivity : AppCompatActivity(), CoroutineScope, ToolsFragment.FinishBt
 
     @SuppressLint("SetTextI18n", "CommitPrefEdits")
     override fun onStart() {
-        prefs.run {
+        getSharedPreferences("User", Context.MODE_PRIVATE).run {
             navView.getHeaderView(0).run {
                 Cal.text = "摂取⇒${getInt("calory", 0)}cal"
                 barn.text = "消費⇒${getInt("burn", 0)}cal"
@@ -281,6 +286,7 @@ class MainActivity : AppCompatActivity(), CoroutineScope, ToolsFragment.FinishBt
     override val coroutineContext: CoroutineContext
         get() = Job()
 
+
     override fun onClick() {
         toolbar.title = "カレンダー画面"
         navView.setCheckedItem(R.id.nav_calendar)
@@ -289,10 +295,11 @@ class MainActivity : AppCompatActivity(), CoroutineScope, ToolsFragment.FinishBt
 
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {}
 
+    //    歩数をあれするやつ
     override fun onSensorChanged(event: SensorEvent?) {
         event?.values?.let {
             if (event.sensor.type == Sensor.TYPE_STEP_COUNTER) {
-                stepcount++
+                stepcount = event.values[0].toInt() - sensorcount
             }
         }
     }
@@ -303,23 +310,28 @@ class MainActivity : AppCompatActivity(), CoroutineScope, ToolsFragment.FinishBt
             ?.registerListener(this, mStepCounterSensor, SensorManager.SENSOR_DELAY_NORMAL)
     }
 
+    //    歩数の保存するやつ
     override fun onStop() {
         super.onStop()
-        prefs.edit().putInt("walk", stepcount).apply()
         if (!dayFlg.isDoneDaily()) {
-            viewModel.insert(Step(day.toLong(), stepcount))
-            stepcount = 0
-            prefs.edit().clear().apply()
+            launch {
+                viewModel.insert(Step(day.toLong(), stepcount))
+                prefs.edit().run {
+                    clear()
+                    putInt("sensor", sensorcount)
+                }
+            }
         }
         mSensorManager?.unregisterListener(this, mStepCounterSensor)
     }
 }
-
 @SuppressLint("SimpleDateFormat")
 val today: String = SimpleDateFormat("yyyy年MM月dd日").run { format(Date(System.currentTimeMillis())) }
 
-val day = SimpleDateFormat("yyyyMMdd").run { format(Date(System.currentTimeMillis())) }
+@SuppressLint("SimpleDateFormat")
+val day: String = SimpleDateFormat("yyyyMMdd").run { format(Date(System.currentTimeMillis())) }
 
+//キーボードが消えるやつ
 fun hideKeyboard(activity: Activity) {
     val view = activity.currentFocus
     if (view != null) {

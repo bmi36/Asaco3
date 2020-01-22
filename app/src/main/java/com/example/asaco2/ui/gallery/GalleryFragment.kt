@@ -5,11 +5,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
-import androidx.lifecycle.ViewModelProviders
 import com.example.asaco2.R
 import com.example.asaco2.today
-import com.example.asaco2.ui.home.StepViewModel
 import kotlinx.android.synthetic.main.fragment_gallery.*
 import kotlinx.android.synthetic.main.walk_statu_layout.*
 import java.text.SimpleDateFormat
@@ -30,9 +27,15 @@ class GalleryFragment(private val step: Int) : Fragment() {
 
         dayText.text = today
 
-        dayBtn.setOnClickListener { childFragmentManager.beginTransaction().replace(frame.id, GraphFragment(day.toLong(),step)).commit() }
-        monthBtn.setOnClickListener { childFragmentManager.beginTransaction().replace(frame.id, GraphFragment(month.toLong(),0)).commit() }
-        yearBtn.setOnClickListener { childFragmentManager.beginTransaction().replace(frame.id, GraphFragment(year.toLong(),0)).commit() }
+        dayBtn.setOnClickListener { childFragmentManager.beginTransaction().replace(frame.id, GraphFragment(
+            day.toLong()
+        )).commit() }
+        monthBtn.setOnClickListener { childFragmentManager.beginTransaction().replace(frame.id, GraphFragment(
+            month.toLong()
+        )).commit() }
+        yearBtn.setOnClickListener { childFragmentManager.beginTransaction().replace(frame.id, GraphFragment(
+            year.toLong()
+        )).commit() }
     }
 
     val day: String = SimpleDateFormat("yyyyMMdd").let { it.format(Date(System.currentTimeMillis())) }

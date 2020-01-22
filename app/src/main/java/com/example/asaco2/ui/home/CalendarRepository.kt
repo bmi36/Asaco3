@@ -16,7 +16,7 @@ class CalendarRepository(private val dao: CalendarDao) {
 
 }
 
-class StepRepository(private val dao: StepDao,date: Long){
+class StepRepository(private val dao: StepDao){
 
     @WorkerThread
 

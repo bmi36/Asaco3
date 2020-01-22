@@ -2,7 +2,6 @@ package com.example.asaco2.ui.home
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import java.sql.SQLException
@@ -32,13 +31,13 @@ class CalendarViewModel(application: Application) : AndroidViewModel(application
     fun getCalendar(id: Long): List<CalendarEntity>? = calendarRepository.getCalendar(id)
 }
 
-class StepViewModel(application: Application, date: Long) : AndroidViewModel(application) {
+class StepViewModel(application: Application) : AndroidViewModel(application) {
     private val stepRepository: StepRepository
 
     private var repoDao: StepDao = StepDataBase.getInstance(application).dao()
 
     init {
-        stepRepository = StepRepository(repoDao,date)
+        stepRepository = StepRepository(repoDao)
     }
 
     fun getstep(date: Long): Array<Step> = viewModelScope.run { repoDao.getEntity(date) }
