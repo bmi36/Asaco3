@@ -85,7 +85,7 @@ class MainActivity : AppCompatActivity(), CoroutineScope, ToolsFragment.FinishBt
                 when (it.itemId) {
                     R.id.nav_slideshow -> {
                         if (flg) takePicture()
-//                        action(null)
+                        action(null)
 
                         true
                     }
