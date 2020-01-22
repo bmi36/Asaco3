@@ -31,46 +31,51 @@ class GraphFragment(private val date: Long, private val type: Int) : Fragment(),
 
     private lateinit var list: Array<Step>
 
+    var barChar: ArrayList<BarEntry>? = null
+
+    var listname: ArrayList<String>? = null
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         viewModel = ViewModelProviders.of(this)[StepViewModel::class.java]
 
-        launch {
 
-            list = viewModel.getstep(date)
+        launch { action() }
 
-            var barChar: ArrayList<BarEntry>? = null
+        if (barChar != null) {
 
-            var listname: ArrayList<String>? = null
+            val barDataSet = BarDataSet(barChar, "Cels")
 
-            for (element in list) {
-                barChar = arrayListOf(BarEntry(element.step.toFloat(), element.id.toInt()))
-                listname = arrayListOf(element.id.toString())
-            }
+            val barData = BarData(listname, barDataSet)
 
-            if (list.size < type){
-                val differnce = type - list.size
-                for (index in 0..differnce){
-                    barChar = arrayListOf(BarEntry(0f,12))
-                    listname = arrayListOf("次のやつ")
-                }
-            }
-
-            if (barChar != null) {
-                val barDataSet = BarDataSet(barChar, "Cels")
-
-                val barData = BarData(listname, barDataSet)
-
-                chart.run {
-                    data = barData
-                    barDataSet.setColors(ColorTemplate.COLORFUL_COLORS)
-                }
+            chart.run {
+                data = barData
+                barDataSet.setColors(ColorTemplate.COLORFUL_COLORS)
+                animateY(2500)
             }
         }
-        chart.animateY(2500)
+    }
+
+    private suspend fun action()= withContext(Dispatchers.Default) {
+
+        list = viewModel.getstep(date)
+
+        for (element in list) {
+            barChar = arrayListOf(BarEntry(element.step.toFloat(), element.id.toInt()))
+            listname = arrayListOf(element.id.toString())
+        }
+
+        if (list.size < type) {
+            val differnce = type - list.size
+            for (index in 0..differnce) {
+                barChar = arrayListOf(BarEntry(0f, 12))
+                listname = arrayListOf("次のやつ")
+            }
+        }
+
     }
 
     override val coroutineContext: CoroutineContext
-        get() = Job()
+    get() = Job()
 }
