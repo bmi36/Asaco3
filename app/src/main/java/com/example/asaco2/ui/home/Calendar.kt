@@ -8,6 +8,7 @@ import androidx.core.widget.NestedScrollView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProviders
 import com.example.asaco2.R
+import com.example.asaco2.today
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import kotlinx.android.synthetic.main.fragment_home.*
 import kotlinx.coroutines.CoroutineScope
@@ -18,7 +19,8 @@ import kotlin.coroutines.CoroutineContext
 
 class Calendar : Fragment(), CoroutineScope {
 
-    private lateinit var viewModel: CalendarViewModel
+    private lateinit var calendaredModel: CalendarViewModel
+    private lateinit var stepModel: StepViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -47,19 +49,21 @@ class Calendar : Fragment(), CoroutineScope {
 
             val id = "$year$strMonth$strDay".toLong()
 
-            viewModel = activity?.run {
-                ViewModelProviders.of(this)[CalendarViewModel::class.java]
+             activity?.run {
+                calendaredModel =ViewModelProviders.of(this)[CalendarViewModel::class.java]
+                 stepModel = ViewModelProviders.of(this)[StepViewModel::class.java]
             } ?: throw Exception("Invalid Activity")
 
 
 
             launch {
-                val element = viewModel.getCalendar(id)
+                val element = calendaredModel.getCalendar(id)
+                val step = stepModel.getsumstep(id)
                 if (element != null) {
                     if (element.isNotEmpty()) {
                         activity?.run {
                             supportFragmentManager.beginTransaction()
-                                .replace(include_frame.id, BottomSheetFragment(element, dayString))
+                                .replace(include_frame.id, BottomSheetFragment(element, dayString,step))
                                 .commit()
                         }
 

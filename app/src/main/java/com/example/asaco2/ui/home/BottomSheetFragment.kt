@@ -14,7 +14,8 @@ import kotlinx.android.synthetic.main.fragment_included.view.*
 
 class BottomSheetFragment(
     private val list: List<CalendarEntity>,
-    private val dayString: String
+    private val dayString: String,
+    private val step: Int
 ) : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -39,7 +40,7 @@ class BottomSheetFragment(
         }
         nowText.text = dayString
         sumText.text = "合計：${total}cal"
-        val hosuu = 356 //代替　歩数
+        val hosuu = step
 
         val bmr = activity?.getSharedPreferences("User",Context.MODE_PRIVATE)?.getInt("bmr",0)
             ?: 0

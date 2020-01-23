@@ -44,7 +44,7 @@ class StepViewModel(application: Application) : AndroidViewModel(application) {
     fun getsumstep(date: Long): Int = viewModelScope.run { repoDao.getstep(date) }
     fun insert(step: Step) = viewModelScope.launch { repoDao.insert(step) }
     fun update(step: Step) = viewModelScope.launch { repoDao.update(step) }
-    fun InsertOrUpdata(entity: Step) = viewModelScope.launch {
+    fun IorU(entity: Step) = viewModelScope.launch {
         try {
             stepRepository.insert(entity)
         } catch (e: SQLException) {

@@ -11,11 +11,16 @@ import com.example.asaco2.today
 import com.example.asaco2.ui.home.StepViewModel
 import kotlinx.android.synthetic.main.fragment_gallery.*
 import kotlinx.android.synthetic.main.walk_statu_layout.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers.Default
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.runBlocking
+import java.sql.SQLException
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.coroutines.CoroutineContext
 
-class GalleryFragment(private val step: Int) : Fragment() {
+class GalleryFragment(private val step: Int) : Fragment(),CoroutineScope {
 
     private lateinit var viewModel: StepViewModel
 
@@ -53,13 +58,21 @@ class GalleryFragment(private val step: Int) : Fragment() {
             12 -> month
             else -> null
         }
-        val list: Array<Int> =
-            runBlocking {
-                Array(size) { index ->
-                    viewModel.getsumstep((search?.let { it.toInt() - index - 1 } ?: 0).toLong())
+        var list: Array<Int>?
+        runBlocking(Default) {
+                try {
+                    list = Array(size) { index ->
+                        viewModel.getsumstep((search?.let { it.toInt() - index - 1 } ?: 0).toLong())
+                    }
+                    arrayOf(step)
+                    childFragmentManager.beginTransaction().replace(frame.id, GraphFragment(list)).commit()
+                }catch (e: SQLException){
+                    e.printStackTrace()
                 }
-                arrayOf(step)
+
             }
-        childFragmentManager.beginTransaction().replace(frame.id, GraphFragment(list)).commit()
     }
+
+    override val coroutineContext: CoroutineContext
+        get() = Job()
 }

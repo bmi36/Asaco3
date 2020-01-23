@@ -272,6 +272,7 @@ class MainActivity : AppCompatActivity(), CoroutineScope, ToolsFragment.FinishBt
 
     @SuppressLint("SetTextI18n", "CommitPrefEdits")
     override fun onStart() {
+        sensorcount = prefs.getInt("sensor",0)
         getSharedPreferences("User", Context.MODE_PRIVATE).run {
             navView.getHeaderView(0).run {
                 Cal.text = "摂取⇒${getInt("calory", 0)}cal"
@@ -298,7 +299,8 @@ class MainActivity : AppCompatActivity(), CoroutineScope, ToolsFragment.FinishBt
     override fun onSensorChanged(event: SensorEvent?) {
         event?.values?.let {
             if (event.sensor.type == Sensor.TYPE_STEP_COUNTER) {
-                stepcount = event.values[0].toInt() - sensorcount
+                stepcount++
+                sensorcount++
             }
         }
     }
@@ -314,10 +316,10 @@ class MainActivity : AppCompatActivity(), CoroutineScope, ToolsFragment.FinishBt
         super.onStop()
         if (!dayFlg.isDoneDaily()) {
             launch {
-                viewModel.insert(Step(time.toLong(), stepcount))
+                viewModel.IorU(Step(time.toLong(), stepcount))
                 prefs.edit().run {
                     clear()
-                    putInt("sensor", sensorcount)
+                    putInt("sensor", )
                 }
             }
         }
@@ -334,5 +336,5 @@ fun hideKeyboard(activity: Activity) {
         manager.hideSoftInputFromWindow(view.windowToken, 0)
     }
 }
-val time: String = SimpleDateFormat("yyyyMMddhhmmss").run { format(Date(System.currentTimeMillis())) }
+val time: String = SimpleDateFormat("yyyyMMdd").run { format(Date(System.currentTimeMillis())) }
 val today: String = SimpleDateFormat("yyyy年MM月dd日").run { format(Date(System.currentTimeMillis())) }

@@ -15,16 +15,14 @@ import kotlinx.android.synthetic.main.graph_fragment.*
 import kotlinx.coroutines.*
 import kotlin.coroutines.CoroutineContext
 
-class GraphFragment(private val list: Array<Int>) : Fragment(), CoroutineScope {
+class GraphFragment(private val list: Array<Int>?) : Fragment(), CoroutineScope {
 
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? =
-
-        inflater.inflate(R.layout.graph_fragment, container, false)
+    ): View? = inflater.inflate(R.layout.graph_fragment, container, false)
 
     var barChar: ArrayList<BarEntry>? = null
 
@@ -32,9 +30,6 @@ class GraphFragment(private val list: Array<Int>) : Fragment(), CoroutineScope {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-
-
 
         launch { action() }
 
@@ -52,14 +47,15 @@ class GraphFragment(private val list: Array<Int>) : Fragment(), CoroutineScope {
         }
     }
 
-    private suspend fun action()= withContext(Dispatchers.Default) {
-
-        for (i in list.indices) {
-            barChar = arrayListOf(BarEntry(list[i].toFloat(), i))
-            listname = arrayListOf(i.toString())
+    private suspend fun action() = withContext(Dispatchers.Default) {
+        list?.let {
+            for (i in list.indices) {
+                barChar = arrayListOf(BarEntry(list[i].toFloat(), i))
+                listname = arrayListOf(i.toString())
+            }
         }
     }
 
     override val coroutineContext: CoroutineContext
-    get() = Job()
+        get() = Job()
 }

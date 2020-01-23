@@ -25,9 +25,10 @@ import kotlin.coroutines.CoroutineContext
 
 class CameraResult : AppCompatActivity(), CoroutineScope {
 
-//    private lateinit var viewModel: CalendarViewModel
+    //    private lateinit var viewModel: CalendarViewModel
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setTheme(R.style.AppTheme_NoActionBar)
         setContentView(R.layout.activity_camera_result)
 
         val fileDir = intent?.extras?.get("file") as Uri
@@ -38,20 +39,21 @@ class CameraResult : AppCompatActivity(), CoroutineScope {
         supportFragmentManager.beginTransaction()
             .replace(frame.id, LoaderFragment())
             .commitNow()
-        job(uri,file).start()
+        job(uri, file).start()
     }
 
-    private fun job(uri: Uri, file: File) = launch(Dispatchers.Main){
+    private fun job(uri: Uri, file: File) = launch(Dispatchers.Main) {
         val baseImage: String = toBase(BitmapFactory.decodeFile(file.absolutePath))
 
-        withContext(Dispatchers.Default){
+        withContext(Dispatchers.Default) {
             retrofitBuild().create(RetrofitInterface::class.java)
                 .sendImage(baseImage).enqueue(object : Callback<Cook> {
 
                     override fun onFailure(call: Call<Cook>, t: Throwable) {
 
-                        Log.d("test",t.message)
-                        supportFragmentManager.beginTransaction().replace(frame.id, ImageFileFragment())
+                        Log.d("test", t.message)
+                        supportFragmentManager.beginTransaction()
+                            .replace(frame.id, ImageFileFragment())
                             .commit()
                     }
 
