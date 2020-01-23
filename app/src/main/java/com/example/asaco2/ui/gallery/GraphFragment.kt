@@ -5,10 +5,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProviders
 import com.example.asaco2.R
 import com.example.asaco2.ui.home.Step
-import com.example.asaco2.ui.home.StepViewModel
 import com.github.mikephil.charting.data.BarData
 import com.github.mikephil.charting.data.BarDataSet
 import com.github.mikephil.charting.data.BarEntry
@@ -17,9 +15,8 @@ import kotlinx.android.synthetic.main.graph_fragment.*
 import kotlinx.coroutines.*
 import kotlin.coroutines.CoroutineContext
 
-class GraphFragment(private val date: Long, private val type: Int) : Fragment(), CoroutineScope {
+class GraphFragment(private val list: Array<Int>) : Fragment(), CoroutineScope {
 
-    private lateinit var viewModel: StepViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -29,8 +26,6 @@ class GraphFragment(private val date: Long, private val type: Int) : Fragment(),
 
         inflater.inflate(R.layout.graph_fragment, container, false)
 
-    private lateinit var list: Array<Step>
-
     var barChar: ArrayList<BarEntry>? = null
 
     var listname: ArrayList<String>? = null
@@ -38,7 +33,7 @@ class GraphFragment(private val date: Long, private val type: Int) : Fragment(),
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        viewModel = ViewModelProviders.of(this)[StepViewModel::class.java]
+
 
 
         launch { action() }
@@ -52,28 +47,17 @@ class GraphFragment(private val date: Long, private val type: Int) : Fragment(),
             chart.run {
                 data = barData
                 barDataSet.setColors(ColorTemplate.COLORFUL_COLORS)
-                animateY(2500)
+                animateY(1500)
             }
         }
     }
 
     private suspend fun action()= withContext(Dispatchers.Default) {
 
-        list = viewModel.getstep(date)
-
-        for (element in list) {
-            barChar = arrayListOf(BarEntry(element.step.toFloat(), element.id.toInt()))
-            listname = arrayListOf(element.id.toString())
+        for (i in list.indices) {
+            barChar = arrayListOf(BarEntry(list[i].toFloat(), i))
+            listname = arrayListOf(i.toString())
         }
-
-        if (list.size < type) {
-            val differnce = type - list.size
-            for (index in 0..differnce) {
-                barChar = arrayListOf(BarEntry(0f, 12))
-                listname = arrayListOf("次のやつ")
-            }
-        }
-
     }
 
     override val coroutineContext: CoroutineContext

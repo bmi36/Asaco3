@@ -23,8 +23,6 @@ import retrofit2.Response
 import java.io.File
 import kotlin.coroutines.CoroutineContext
 
-const val IMAGE_REQUEST_CODE = 3
-
 class CameraResult : AppCompatActivity(), CoroutineScope {
 
 //    private lateinit var viewModel: CalendarViewModel
@@ -32,10 +30,10 @@ class CameraResult : AppCompatActivity(), CoroutineScope {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_camera_result)
 
-        val fileDir = intent.extras.get("file") as Uri
+        val fileDir = intent?.extras?.get("file") as Uri
         val file: File = fileDir.toFile()
 
-        val uri = intent.extras.get("uri") as Uri
+        val uri = intent?.extras?.get("uri") as Uri
         frame.visibility = FrameLayout.VISIBLE
         supportFragmentManager.beginTransaction()
             .replace(frame.id, LoaderFragment())

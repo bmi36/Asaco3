@@ -91,12 +91,12 @@ class MainActivity : AppCompatActivity(), CoroutineScope, ToolsFragment.FinishBt
                     }
 
                     R.id.nav_calendar -> {
-                        toolbar.title = "カレンダー画面"
+                        toolbar.title = "カレンダー"
                         action(Calendar())
                     }
 
                     R.id.nav_gallery -> {
-                        toolbar.title = "徒歩"
+                        toolbar.title = "歩数"
                         action(GalleryFragment(stepcount))
                     }
 
@@ -287,7 +287,7 @@ class MainActivity : AppCompatActivity(), CoroutineScope, ToolsFragment.FinishBt
 
 
     override fun onClick() {
-        toolbar.title = "カレンダー画面"
+        toolbar.title = "カレンダー"
         navView.setCheckedItem(R.id.nav_calendar)
         action(Calendar())
     }
@@ -314,7 +314,7 @@ class MainActivity : AppCompatActivity(), CoroutineScope, ToolsFragment.FinishBt
         super.onStop()
         if (!dayFlg.isDoneDaily()) {
             launch {
-                viewModel.insert(Step(day.toLong(), stepcount))
+                viewModel.insert(Step(time.toLong(), stepcount))
                 prefs.edit().run {
                     clear()
                     putInt("sensor", sensorcount)
@@ -325,11 +325,6 @@ class MainActivity : AppCompatActivity(), CoroutineScope, ToolsFragment.FinishBt
     }
 }
 
-@SuppressLint("SimpleDateFormat")
-val today: String = SimpleDateFormat("yyyy年MM月dd日").run { format(Date(System.currentTimeMillis())) }
-
-@SuppressLint("SimpleDateFormat")
-val day: String = SimpleDateFormat("yyyyMMdd").run { format(Date(System.currentTimeMillis())) }
 
 //キーボードが消えるやつ
 fun hideKeyboard(activity: Activity) {
@@ -339,3 +334,5 @@ fun hideKeyboard(activity: Activity) {
         manager.hideSoftInputFromWindow(view.windowToken, 0)
     }
 }
+val time: String = SimpleDateFormat("yyyyMMddhhmmss").run { format(Date(System.currentTimeMillis())) }
+val today: String = SimpleDateFormat("yyyy年MM月dd日").run { format(Date(System.currentTimeMillis())) }

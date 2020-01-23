@@ -47,10 +47,10 @@ class ToolsFragment(
         val prefs = content.getSharedPreferences("User", Context.MODE_PRIVATE)
         val checkId: Int = prefs.getInt("sex", 0)
 
-        userName.setText(prefs.getString("name", "HUNTER"))
-        weight.setText(prefs.getString("weight", "0"))
-        high.setText(prefs.getString("height", "0"))
-        agetext.setText(prefs.getString("age", "0"))
+        userName.setText(prefs.getString("name", "梅田ひろし"))
+        weight.setText(prefs.getString("weight", 60f.toString()))
+        high.setText(prefs.getString("height", 170f.toString()))
+        agetext.setText(prefs.getString("age", "34"))
         Btngroup.check(checkId)
 
 

@@ -5,15 +5,19 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProviders
 import com.example.asaco2.R
 import com.example.asaco2.today
+import com.example.asaco2.ui.home.StepViewModel
 import kotlinx.android.synthetic.main.fragment_gallery.*
-import kotlinx.android.synthetic.main.nav_header_main.*
 import kotlinx.android.synthetic.main.walk_statu_layout.*
+import kotlinx.coroutines.runBlocking
 import java.text.SimpleDateFormat
 import java.util.*
 
 class GalleryFragment(private val step: Int) : Fragment() {
+
+    private lateinit var viewModel: StepViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -26,24 +30,36 @@ class GalleryFragment(private val step: Int) : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        viewModel = ViewModelProviders.of(this)[StepViewModel::class.java]
+
+
         dayText.text = today
 
-        dayBtn.setOnClickListener { childFragmentManager.beginTransaction().replace(frame.id, GraphFragment(
-            day.toLong(),daylast
-        )).commit() }
-        monthBtn.setOnClickListener { childFragmentManager.beginTransaction().replace(frame.id, GraphFragment(
-            month.toLong(),12
-        )).commit() }
-        yearBtn.setOnClickListener { childFragmentManager.beginTransaction().replace(frame.id, GraphFragment(
-            year.toLong(),0
-        )).commit() }
+        dayBtn.setOnClickListener { listener(7) }
+        monthBtn.setOnClickListener { listener(12) }
     }
 
-    val day: String = SimpleDateFormat("yyyyMMdd").let { it.format(Date(System.currentTimeMillis())) }
+    private val currentTimeMillis = Date(System.currentTimeMillis())
+    val day: String = SimpleDateFormat("yyyyMMdd").run { format(currentTimeMillis) }
     val month: String = SimpleDateFormat("yyyyMM").run { format(Date(System.currentTimeMillis())) }
-    val year: String = SimpleDateFormat("yyyy").run { format(Date(System.currentTimeMillis())) }
     val daylast = Calendar.getInstance().let {
-        it.set(Calendar.MONTH,1)
+        it.set(Calendar.MONTH, 1)
         it.getActualMaximum(Calendar.DATE)
+    }
+
+    private fun listener(size: Int) {
+        val search = when (size) {
+            7 -> day
+            12 -> month
+            else -> null
+        }
+        val list: Array<Int> =
+            runBlocking {
+                Array(size) { index ->
+                    viewModel.getsumstep((search?.let { it.toInt() - index - 1 } ?: 0).toLong())
+                }
+                arrayOf(step)
+            }
+        childFragmentManager.beginTransaction().replace(frame.id, GraphFragment(list)).commit()
     }
 }

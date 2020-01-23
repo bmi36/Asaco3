@@ -40,7 +40,7 @@ class StepViewModel(application: Application) : AndroidViewModel(application) {
         stepRepository = StepRepository(repoDao)
     }
 
-    fun getstep(date: Long): Array<Step> = viewModelScope.run { repoDao.getEntity(date) }
+    fun getStep(date: Long): Array<Step> = viewModelScope.run { repoDao.getEntity(date) }
     fun getsumstep(date: Long): Int = viewModelScope.run { repoDao.getstep(date) }
     fun insert(step: Step) = viewModelScope.launch { repoDao.insert(step) }
     fun update(step: Step) = viewModelScope.launch { repoDao.update(step) }
