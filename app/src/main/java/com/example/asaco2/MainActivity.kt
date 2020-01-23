@@ -299,8 +299,7 @@ class MainActivity : AppCompatActivity(), CoroutineScope, ToolsFragment.FinishBt
     override fun onSensorChanged(event: SensorEvent?) {
         event?.values?.let {
             if (event.sensor.type == Sensor.TYPE_STEP_COUNTER) {
-                stepcount++
-                sensorcount++
+                stepcount = event.values[0].toInt() - sensorcount
             }
         }
     }
@@ -319,7 +318,7 @@ class MainActivity : AppCompatActivity(), CoroutineScope, ToolsFragment.FinishBt
                 viewModel.IorU(Step(time.toLong(), stepcount))
                 prefs.edit().run {
                     clear()
-                    putInt("sensor", )
+                    putInt("sensor",sensorcount )
                 }
             }
         }
