@@ -27,6 +27,6 @@ data class Step(
     @PrimaryKey
     val id: Long,
     @ColumnInfo(name = "entity_step")
-    val step: Int
-)
+    var step: Int
+):Serializable
 

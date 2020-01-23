@@ -17,9 +17,9 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.inputmethod.InputMethodManager
-import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -40,10 +40,13 @@ import com.example.asaco2.ui.tools.ToolsFragment
 import com.google.android.material.navigation.NavigationView
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.app_bar_main.*
+import kotlinx.android.synthetic.main.nav_header_main.*
 import kotlinx.android.synthetic.main.nav_header_main.view.*
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers.Default
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
@@ -70,6 +73,8 @@ class MainActivity : AppCompatActivity(), CoroutineScope, ToolsFragment.FinishBt
     private var sensorcount: Int = 0
     private lateinit var viewModel: StepViewModel
     private var flg = false
+    private var hohaba = 0
+    private var weight = 0
 
     private val appBarConfiguration: AppBarConfiguration by lazy {
         AppBarConfiguration(
@@ -97,7 +102,7 @@ class MainActivity : AppCompatActivity(), CoroutineScope, ToolsFragment.FinishBt
 
                     R.id.nav_gallery -> {
                         toolbar.title = "歩数"
-                        action(GalleryFragment(stepcount))
+                        action(GalleryFragment())
                     }
 
                     R.id.nav_tools -> {
@@ -186,7 +191,6 @@ class MainActivity : AppCompatActivity(), CoroutineScope, ToolsFragment.FinishBt
     //ぱーにっしょん確認するやつ
     private fun checkPermission(permissions: Array<String>, request_code: Int) {
         ActivityCompat.requestPermissions(this, permissions, request_code)
-//        takePicture()
     }
 
     //    パーミッションのリクエストとかのそうゆうやつ
@@ -272,16 +276,22 @@ class MainActivity : AppCompatActivity(), CoroutineScope, ToolsFragment.FinishBt
 
     @SuppressLint("SetTextI18n", "CommitPrefEdits")
     override fun onStart() {
+        stepcount = runBlocking(Default) { viewModel.getsumstep(time.toLong()) }
+        Log.d("test",stepcount.toString())
         sensorcount = prefs.getInt("sensor",0)
         getSharedPreferences("User", Context.MODE_PRIVATE).run {
+            hohaba = (getString("height","170f").toFloat().toInt()*0.45).toInt()
+            weight = getString("weight","60f").toFloat().toInt()
             navView.getHeaderView(0).run {
                 Cal.text = "摂取⇒${getInt("calory", 0)}cal"
-                barn.text = "消費⇒${getInt("burn", 0)}cal"
+                barn.text = "消費⇒${calgary()}cal"
             }
         }
 
         super.onStart()
     }
+
+    private fun calgary() = stepcount.let { 1.05 * ( 3 * hohaba * it ) * weight }.toInt()
 
     override val coroutineContext: CoroutineContext
         get() = Job()
@@ -296,12 +306,12 @@ class MainActivity : AppCompatActivity(), CoroutineScope, ToolsFragment.FinishBt
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {}
 
     //    歩数をあれするやつ
-    override fun onSensorChanged(event: SensorEvent?) {
-        event?.values?.let {
-            if (event.sensor.type == Sensor.TYPE_STEP_COUNTER) {
-                stepcount = event.values[0].toInt() - sensorcount
-            }
-        }
+    override fun onSensorChanged(event: SensorEvent) {
+        if (event.sensor.type == Sensor.TYPE_STEP_COUNTER) stepcount++
+
+        sensorcount = event.values[0].toInt()
+
+        navView.getHeaderView(0).barn.text = "消費⇒${calgary()}cal"
     }
 
     override fun onResume() {
@@ -313,19 +323,14 @@ class MainActivity : AppCompatActivity(), CoroutineScope, ToolsFragment.FinishBt
     //    歩数の保存するやつ
     override fun onStop() {
         super.onStop()
-        if (!dayFlg.isDoneDaily()) {
-            launch {
-                viewModel.IorU(Step(time.toLong(), stepcount))
-                prefs.edit().run {
-                    clear()
-                    putInt("sensor",sensorcount )
-                }
-            }
+        launch {
+            viewModel.IorU(Step(time.toLong(), stepcount + sensorcount))
+            if (!dayFlg.isDoneDaily()) { prefs.edit().clear().apply() }
+            prefs.edit().putInt("sensor", sensorcount)
         }
         mSensorManager?.unregisterListener(this, mStepCounterSensor)
     }
 }
-
 
 //キーボードが消えるやつ
 fun hideKeyboard(activity: Activity) {

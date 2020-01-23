@@ -40,11 +40,11 @@ class BottomSheetFragment(
         }
         nowText.text = dayString
         sumText.text = "合計：${total}cal"
-        val hosuu = step
+        walkCalText.text = "${step}歩"
 
         val bmr = activity?.getSharedPreferences("User",Context.MODE_PRIVATE)?.getInt("bmr",0)
             ?: 0
 
-        totalCalText.text = "カロリー差：${total - hosuu-bmr}cal"
+        totalCalText.text = "カロリー差：${total - step-bmr}cal"
     }
 }
