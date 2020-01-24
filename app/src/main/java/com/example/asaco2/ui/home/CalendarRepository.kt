@@ -16,14 +16,3 @@ class CalendarRepository(private val dao: CalendarDao) {
 
 }
 
-class StepRepository(private val dao: StepDao){
-
-    @WorkerThread
-
-    suspend fun insert(step: Step) = dao.update(step)
-    fun getStep(date: Long) = dao.getstep(date)
-
-    suspend fun update(step: Step) = dao.update(step)
-
-}
-

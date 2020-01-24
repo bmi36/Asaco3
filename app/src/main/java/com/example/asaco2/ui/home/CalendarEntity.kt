@@ -20,13 +20,3 @@ data class CalendarEntity(
 
 
 ):Serializable
-
-
-@Entity(tableName = "StepEntity")
-data class Step(
-    @PrimaryKey
-    val id: Long,
-    @ColumnInfo(name = "entity_step")
-    var step: Int
-):Serializable
-

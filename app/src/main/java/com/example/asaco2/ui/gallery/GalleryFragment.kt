@@ -7,12 +7,13 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProviders
 import com.example.asaco2.R
+import com.example.asaco2.StepViewModel
 import com.example.asaco2.time
 import com.example.asaco2.today
-import com.example.asaco2.ui.home.StepViewModel
 import kotlinx.android.synthetic.main.fragment_gallery.*
 import kotlinx.android.synthetic.main.walk_statu_layout.*
 import kotlinx.coroutines.Dispatchers.Default
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.runBlocking
 import java.text.SimpleDateFormat
 import java.util.*
@@ -49,9 +50,7 @@ class GalleryFragment : Fragment() {
         }
 
         runBlocking(Default) {
-            val list: Array<Int> = Array(size) { index ->
-                (search - index).toLong().let { viewModel.getsumstep(it) }
-            }
+            val list: Job = viewModel.getStep(day.toLong())
 
             childFragmentManager.beginTransaction().replace(frame.id, GraphFragment(list, time)).commit()
         }

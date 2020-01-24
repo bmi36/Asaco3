@@ -30,26 +30,3 @@ class CalendarViewModel(application: Application) : AndroidViewModel(application
 
     fun getCalendar(id: Long): List<CalendarEntity>? = calendarRepository.getCalendar(id)
 }
-
-class StepViewModel(application: Application) : AndroidViewModel(application) {
-    private val stepRepository: StepRepository
-
-    private var repoDao: StepDao = StepDataBase.getInstance(application).dao()
-
-    init {
-        stepRepository = StepRepository(repoDao)
-    }
-
-    fun getStep(date: Long): Array<Step> = viewModelScope.run { repoDao.getEntity(date) }
-    fun getsumstep(date: Long): Int = viewModelScope.run { repoDao.getstep(date) }
-    fun insert(step: Step) = viewModelScope.launch { repoDao.insert(step) }
-    fun update(step: Step) = viewModelScope.launch { repoDao.update(step) }
-    fun IorU(entity: Step) = viewModelScope.launch {
-        try {
-            stepRepository.insert(entity)
-        } catch (e: SQLException) {
-            e.printStackTrace()
-            stepRepository.update(entity)
-        }
-    }
-}

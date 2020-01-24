@@ -34,19 +34,14 @@ import androidx.navigation.ui.navigateUp
 import com.example.asaco2.ui.camera.CameraResult
 import com.example.asaco2.ui.gallery.GalleryFragment
 import com.example.asaco2.ui.home.Calendar
-import com.example.asaco2.ui.home.Step
-import com.example.asaco2.ui.home.StepViewModel
 import com.example.asaco2.ui.tools.ToolsFragment
 import com.google.android.material.navigation.NavigationView
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.app_bar_main.*
-import kotlinx.android.synthetic.main.nav_header_main.*
 import kotlinx.android.synthetic.main.nav_header_main.view.*
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers.Default
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
@@ -78,8 +73,12 @@ class MainActivity : AppCompatActivity(), CoroutineScope, ToolsFragment.FinishBt
 
     private val appBarConfiguration: AppBarConfiguration by lazy {
         AppBarConfiguration(
-            setOf(R.id.nav_calendar, R.id.nav_gallery, R.id.nav_slideshow, R.id.nav_tools),
-            drawer_layout
+            setOf(
+                R.id.nav_calendar,
+                R.id.nav_gallery,
+                R.id.nav_slideshow,
+                R.id.nav_tools
+            ), drawer_layout
         )
     }
 
@@ -102,7 +101,14 @@ class MainActivity : AppCompatActivity(), CoroutineScope, ToolsFragment.FinishBt
 
                     R.id.nav_gallery -> {
                         toolbar.title = "歩数"
-                        action(GalleryFragment())
+                        action(GalleryFragment()).apply {
+                            viewModel.UandI(
+                                StepEntity(
+                                    time.toLong(),
+                                    stepcount
+                                )
+                            )
+                        }
                     }
 
                     R.id.nav_tools -> {
@@ -136,8 +142,6 @@ class MainActivity : AppCompatActivity(), CoroutineScope, ToolsFragment.FinishBt
 
         prefs = getSharedPreferences("Cock", Context.MODE_PRIVATE)
 
-        prefs.getInt("sensor", 0)
-
         fab.setOnClickListener {
             //カメラボタンが押されたときになんかするやつ
             if (flg) takePicture()
@@ -145,6 +149,7 @@ class MainActivity : AppCompatActivity(), CoroutineScope, ToolsFragment.FinishBt
 
         }
         viewModel = ViewModelProviders.of(this)[StepViewModel::class.java]
+
         //どろわーの設定
         ActionBarDrawerToggle(
             this,
@@ -276,12 +281,14 @@ class MainActivity : AppCompatActivity(), CoroutineScope, ToolsFragment.FinishBt
 
     @SuppressLint("SetTextI18n", "CommitPrefEdits")
     override fun onStart() {
-        stepcount = runBlocking(Default) { viewModel.getsumstep(time.toLong()) }
-        Log.d("test",stepcount.toString())
-        sensorcount = prefs.getInt("sensor",0)
+
+        Log.d("test", stepcount.toString())
+        sensorcount = prefs.getInt("sensor", 0)
+
+        stepcount = prefs.getInt("walk", 0)
         getSharedPreferences("User", Context.MODE_PRIVATE).run {
-            hohaba = (getString("height","170f").toFloat().toInt()*0.45).toInt()
-            weight = getString("weight","60f").toFloat().toInt()
+            hohaba = (getString("height", "170f").toFloat().toInt() * 0.45).toInt()
+            weight = getString("weight", "60f").toFloat().toInt()
             navView.getHeaderView(0).run {
                 Cal.text = "摂取⇒${getInt("calory", 0)}cal"
                 barn.text = "消費⇒${calgary()}cal"
@@ -291,7 +298,7 @@ class MainActivity : AppCompatActivity(), CoroutineScope, ToolsFragment.FinishBt
         super.onStart()
     }
 
-    private fun calgary() = stepcount.let { 1.05 * ( 3 * hohaba * it ) * weight }.toInt()
+    private fun calgary() = stepcount.let { 1.05 * (3 * hohaba * it) * weight }.toInt()
 
     override val coroutineContext: CoroutineContext
         get() = Job()
@@ -307,10 +314,12 @@ class MainActivity : AppCompatActivity(), CoroutineScope, ToolsFragment.FinishBt
 
     //    歩数をあれするやつ
     override fun onSensorChanged(event: SensorEvent) {
-        if (event.sensor.type == Sensor.TYPE_STEP_COUNTER) stepcount++
-
-        sensorcount = event.values[0].toInt()
-
+        when (event.sensor.type) {
+            Sensor.TYPE_STEP_COUNTER -> {
+                stepcount++
+                sensorcount = event.values[0].toInt()
+            }
+        }
         navView.getHeaderView(0).barn.text = "消費⇒${calgary()}cal"
     }
 
@@ -323,12 +332,23 @@ class MainActivity : AppCompatActivity(), CoroutineScope, ToolsFragment.FinishBt
     //    歩数の保存するやつ
     override fun onStop() {
         super.onStop()
-        launch {
-            viewModel.IorU(Step(time.toLong(), stepcount + sensorcount))
-            if (!dayFlg.isDoneDaily()) { prefs.edit().clear().apply() }
-            prefs.edit().putInt("sensor", sensorcount)
-        }
         mSensorManager?.unregisterListener(this, mStepCounterSensor)
+        if (!dayFlg.isDoneDaily()) {
+            prefs.run {
+                val day = time.toLong()
+                val step = stepcount
+                viewModel.UandI(StepEntity(day, step))
+                stepcount = 0
+                edit().clear()
+                    .putInt("sensor", sensorcount)
+                    .apply()
+            }
+        } else
+            prefs.edit().run {
+                putInt("sensor", sensorcount)
+                putInt("walk", stepcount)
+                apply()
+            }
     }
 }
 
@@ -340,5 +360,6 @@ fun hideKeyboard(activity: Activity) {
         manager.hideSoftInputFromWindow(view.windowToken, 0)
     }
 }
+
 val time: String = SimpleDateFormat("yyyyMMdd").run { format(Date(System.currentTimeMillis())) }
 val today: String = SimpleDateFormat("yyyy年MM月dd日").run { format(Date(System.currentTimeMillis())) }
