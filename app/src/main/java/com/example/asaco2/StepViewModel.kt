@@ -19,8 +19,8 @@ class StepViewModel(application: Application) : AndroidViewModel(application){
 
     fun insert(entity: StepEntity) = viewModelScope.launch { repository.insert(entity) }
     fun update(entity: StepEntity) = viewModelScope.launch{ repository.update(entity) }
-    suspend fun getsum(id: Long): Int? = withContext(Dispatchers.Default) { repository.getsum(id) }
+    suspend fun getsum(id: Long): Array<Int> = withContext(Dispatchers.Default) { repository.getsum(id) }
 
-    suspend fun getmonth(year: Long): Int? = withContext(Dispatchers.Default){ repository.getMonth(year) }
+    suspend fun getmonth(year: Long): Array<Int> = withContext(Dispatchers.Default){ repository.getMonth(year) }
     fun UandI(entity: StepEntity) = try { insert(entity) }catch (e: Exception){ update(entity) }
 }

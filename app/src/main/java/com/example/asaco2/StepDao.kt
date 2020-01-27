@@ -7,8 +7,8 @@ import androidx.room.Update
 
 @Dao
 interface StepDao{
-    @Query("select sum(step) from entity where data like :data ||'%' group by data ||'%'")
-    suspend fun getsumSteps(data: Long): Int?
+    @Query("select sum(step) from entity where data between :data - 6 and :data group by data")
+    suspend fun getsumSteps(data: Long): Array<Int>
 
     @Insert
     suspend fun insert(entity: StepEntity)
@@ -17,5 +17,5 @@ interface StepDao{
     suspend fun update(entity: StepEntity)
 
     @Query("select sum(step) from entity where data between :year || 01 || '%' and :year || 12 || '%' group by data")
-    suspend fun getMonth(year: Long): Int?
+    suspend fun getMonth(year: Long): Array<Int>
 }

@@ -15,7 +15,7 @@ import kotlinx.coroutines.*
 import kotlin.collections.ArrayList
 import kotlin.coroutines.CoroutineContext
 
-class GraphFragment(private val list: List<Int>, today: String) : Fragment(), CoroutineScope {
+class GraphFragment(private val list: Array<Int>, today: String) : Fragment(), CoroutineScope {
 
 
     override fun onCreateView(
