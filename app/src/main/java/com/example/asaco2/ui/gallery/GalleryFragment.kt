@@ -12,13 +12,18 @@ import com.example.asaco2.time
 import com.example.asaco2.today
 import kotlinx.android.synthetic.main.fragment_gallery.*
 import kotlinx.android.synthetic.main.walk_statu_layout.*
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.Default
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.coroutines.CoroutineContext
 
-class GalleryFragment : Fragment() {
+class GalleryFragment(
+    private val stepcount:Int
+) : Fragment(), CoroutineScope {
 
     private lateinit var viewModel: StepViewModel
 
@@ -35,7 +40,6 @@ class GalleryFragment : Fragment() {
 
         viewModel = ViewModelProviders.of(this)[StepViewModel::class.java]
 
-
         dayText.text = today
 
         dayBtn.setOnClickListener { listener(7) }
@@ -49,15 +53,28 @@ class GalleryFragment : Fragment() {
             else -> 0
         }
 
-        runBlocking(Default) {
-            val list: Job = viewModel.getStep(day.toLong())
-
-            childFragmentManager.beginTransaction().replace(frame.id, GraphFragment(list, time)).commit()
+        launch(Default) {
+            //        リストの生成（1週間or12か月）
+            val list: List<Int> = List(search) { index ->
+                when (val it = viewModel.getStep((year + index).toLong())) {
+                    null -> 0
+                    else -> it
+                }
+            }
+            viewModel.getStep(day.toLong())
+//            グラフの表示
+            childFragmentManager.beginTransaction().replace(frame.id, GraphFragment(list, time))
+                .commit()
         }
     }
 
+    override val coroutineContext: CoroutineContext
+        get() = Job()
+
 }
+
 private val currentTimeMillis = Date(System.currentTimeMillis())
 private val day: String = SimpleDateFormat("yyyyMMdd").run { format(currentTimeMillis) }
 private val month: String = SimpleDateFormat("yyyy/MM").run { format(currentTimeMillis) }
 private fun String.reInt() = this.replace("/", "").toInt()
+private val year: String = SimpleDateFormat("yyyy").run { format(currentTimeMillis) }

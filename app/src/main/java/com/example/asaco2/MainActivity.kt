@@ -73,12 +73,8 @@ class MainActivity : AppCompatActivity(), CoroutineScope, ToolsFragment.FinishBt
 
     private val appBarConfiguration: AppBarConfiguration by lazy {
         AppBarConfiguration(
-            setOf(
-                R.id.nav_calendar,
-                R.id.nav_gallery,
-                R.id.nav_slideshow,
-                R.id.nav_tools
-            ), drawer_layout
+            setOf(R.id.nav_calendar, R.id.nav_gallery, R.id.nav_slideshow, R.id.nav_tools),
+            drawer_layout
         )
     }
 
@@ -101,14 +97,7 @@ class MainActivity : AppCompatActivity(), CoroutineScope, ToolsFragment.FinishBt
 
                     R.id.nav_gallery -> {
                         toolbar.title = "歩数"
-                        action(GalleryFragment()).apply {
-                            viewModel.UandI(
-                                StepEntity(
-                                    time.toLong(),
-                                    stepcount
-                                )
-                            )
-                        }
+                        action(GalleryFragment(stepcount))
                     }
 
                     R.id.nav_tools -> {
