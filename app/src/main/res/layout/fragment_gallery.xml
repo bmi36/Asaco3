@@ -21,7 +21,12 @@
 
     </FrameLayout>
 
-    <include layout="@layout/walk_statu_layout" android:id="@+id/include_walk_statu"/>
+    <include
+        android:id="@+id/include_walk_statu"
+        layout="@layout/walk_statu_layout"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

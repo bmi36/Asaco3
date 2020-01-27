@@ -75,4 +75,6 @@ dependencies {
 
 //    グラフ用のライブラリのやつ
     implementation'com.github.PhilJay:MPAndroidChart:v2.1.6'
+
+    debugImplementation 'com.amitshekhar.android:debug-db:1.0.4'
 }

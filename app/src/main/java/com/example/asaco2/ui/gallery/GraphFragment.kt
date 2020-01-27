@@ -15,7 +15,7 @@ import kotlinx.coroutines.*
 import kotlin.collections.ArrayList
 import kotlin.coroutines.CoroutineContext
 
-class GraphFragment(private val list: Array<Int>, today: String) : Fragment(), CoroutineScope {
+class GraphFragment(private val list: Array<Float>?, today: String) : Fragment(), CoroutineScope {
 
 
     override fun onCreateView(
@@ -50,15 +50,17 @@ class GraphFragment(private val list: Array<Int>, today: String) : Fragment(), C
         chart.animateY(1500)
     }
 
-//    表示するやつを作るやつ
-    private suspend fun action() = withContext(Dispatchers.Default) {
-        if (list.isNotEmpty())
-            for (i in list.indices) {
-                list[i].let {
-                    barChar = arrayListOf(BarEntry(it.toFloat(), i))
-                    nameList = arrayListOf(i.toString())
+    //    表示するやつを作るやつ
+    private fun action() = launch (Dispatchers.Default) {
+        list?.let {
+            if (list.isNotEmpty())
+                for (i in list.indices) {
+                    list[i].let {
+                        barChar = arrayListOf(BarEntry(it, i))
+                        nameList = arrayListOf(i.toString())
+                    }
                 }
-            }
+        }
     }
 
     override val coroutineContext: CoroutineContext

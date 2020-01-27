@@ -11,6 +11,9 @@ import com.example.asaco2.StepViewModel
 import com.example.asaco2.time
 import com.example.asaco2.today
 import kotlinx.android.synthetic.main.fragment_gallery.*
+import kotlinx.android.synthetic.main.module_calory.*
+import kotlinx.android.synthetic.main.module_distance.*
+import kotlinx.android.synthetic.main.module_hosuu.*
 import kotlinx.android.synthetic.main.walk_statu_layout.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.Default
@@ -20,9 +23,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.coroutines.CoroutineContext
 
-class GalleryFragment(
-    private val stepcount:Int
-) : Fragment(), CoroutineScope {
+class GalleryFragment(val stepcount: Int,val calory: String,val dis: String) : Fragment(), CoroutineScope {
 
     private lateinit var viewModel: StepViewModel
 
@@ -40,24 +41,32 @@ class GalleryFragment(
         viewModel = ViewModelProviders.of(this)[StepViewModel::class.java]
 
         dayText.text = today
+        hosuu_text.text = stepcount.toString()
+        calory_text.text =  calory
+        distance_text.text = dis
 
+        listener(7)
         dayBtn.setOnClickListener { listener(7) }
         monthBtn.setOnClickListener { listener(12) }
     }
 
     private fun listener(size: Int) {
         val search: Int = when (size) {
-            7 -> day.reInt()
-            12 -> month.reInt()
+            7 -> day.replaceInt()
+            12 -> month.replaceInt()
             else -> 0
         }
 
         launch(Default) {
             //        リストの生成（1週間or12か月）
-            val list    : Array<Int> = viewModel.getStep(day.toLong())
+            val list: List<Float>? = when(size) {
+                7 -> viewModel.getStep(search.toLong()).map { it.toFloat() }
+                12 -> viewModel.getmonth(search.toLong()).map { it.toFloat() }
+                else -> null
+            }
 //            グラフの表示
-            childFragmentManager.beginTransaction().replace(frame.id, GraphFragment(list, SimpleDateFormat("yyyy/MM/dd").run {format(
-                time)}))
+            childFragmentManager.beginTransaction()
+                .replace(frame.id, GraphFragment(list?.toTypedArray(), time))
                 .commit()
         }
     }
@@ -70,5 +79,5 @@ class GalleryFragment(
 private val currentTimeMillis = Date(System.currentTimeMillis())
 private val day: String = SimpleDateFormat("yyyyMMdd").run { format(currentTimeMillis) }
 private val month: String = SimpleDateFormat("yyyy/MM").run { format(currentTimeMillis) }
-private fun String.reInt() = this.replace("/", "").toInt()
+private fun String.replaceInt() = this.replace("/", "").toInt()
 private val year: String = SimpleDateFormat("yyyy").run { format(currentTimeMillis) }

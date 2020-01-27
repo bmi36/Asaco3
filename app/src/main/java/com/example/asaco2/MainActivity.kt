@@ -38,6 +38,7 @@ import com.example.asaco2.ui.tools.ToolsFragment
 import com.google.android.material.navigation.NavigationView
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.app_bar_main.*
+import kotlinx.android.synthetic.main.fragment_tools.*
 import kotlinx.android.synthetic.main.nav_header_main.view.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -63,9 +64,9 @@ class MainActivity : AppCompatActivity(), CoroutineScope, ToolsFragment.FinishBt
     private var mSensorManager: SensorManager? = null
     private var mStepCounterSensor: Sensor? = null
     private lateinit var prefs: SharedPreferences
-    private var stepcount = 0
+    private var stepcount = -1
     private lateinit var permissions: Array<String>
-    private var sensorcount: Int = 0
+    private var sensorcount: Int = -1
     private lateinit var viewModel: StepViewModel
     private var flg = false
     private var hohaba = 0
@@ -97,7 +98,7 @@ class MainActivity : AppCompatActivity(), CoroutineScope, ToolsFragment.FinishBt
 
                     R.id.nav_gallery -> {
                         toolbar.title = "歩数"
-                        action(GalleryFragment(stepcount))
+                        action(GalleryFragment(stepcount,calgary().toString(),(hohaba*stepcount).toString()))
                     }
 
                     R.id.nav_tools -> {
@@ -239,7 +240,6 @@ class MainActivity : AppCompatActivity(), CoroutineScope, ToolsFragment.FinishBt
             LayoutInflater.from(this).inflate(R.layout.nav_header_main, navView, false).run {
 
                 this.UserName.text = data.getString("name", HUNTER)
-
                 navView.addHeaderView(this)
             }
         }
@@ -287,7 +287,7 @@ class MainActivity : AppCompatActivity(), CoroutineScope, ToolsFragment.FinishBt
         super.onStart()
     }
 
-    private fun calgary() = stepcount.let { 1.05 * (3 * hohaba * it) * weight }.toInt()
+    fun calgary() = stepcount.let { 1.05 * (3 * hohaba * it) * weight }.toInt()
 
     override val coroutineContext: CoroutineContext
         get() = Job()
@@ -326,18 +326,27 @@ class MainActivity : AppCompatActivity(), CoroutineScope, ToolsFragment.FinishBt
             prefs.run {
                 val day = time.toLong()
                 val step = stepcount
-                viewModel.UandI(StepEntity(day, step))
-                stepcount = 0
+                viewModel.insert(StepEntity(day, step))
+                stepcount = -1
                 edit().clear()
                     .putInt("sensor", sensorcount)
                     .apply()
             }
         } else
             prefs.edit().run {
+                viewModel.update(StepEntity(time.toLong(),stepcount))
                 putInt("sensor", sensorcount)
                 putInt("walk", stepcount)
                 apply()
             }
+    }
+
+    private fun StepViewModel.UpdateOrInsert(entity: StepEntity) {
+        try {
+            insert(entity)
+        } catch (e: Exception) {
+            update(entity)
+        }
     }
 }
 
