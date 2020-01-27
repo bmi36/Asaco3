@@ -54,9 +54,10 @@ class GalleryFragment(
 
         launch(Default) {
             //        リストの生成（1週間or12か月）
-            val list: Array<Int> = viewModel.getStep(day.toLong())
+            val list    : Array<Int> = viewModel.getStep(day.toLong())
 //            グラフの表示
-            childFragmentManager.beginTransaction().replace(frame.id, GraphFragment(list, time))
+            childFragmentManager.beginTransaction().replace(frame.id, GraphFragment(list, SimpleDateFormat("yyyy/MM/dd").run {format(
+                time)}))
                 .commit()
         }
     }
