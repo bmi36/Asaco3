@@ -278,15 +278,15 @@ class MainActivity : AppCompatActivity(), CoroutineScope, ToolsFragment.FinishBt
             hohaba = (getString("height", "170f").toDouble()/100 * 0.45)
             weight = getString("weight", "60f").toDouble()
             navView.getHeaderView(0).run {
-                Cal.text = "摂取⇒${getInt("calory", 0)}cal"
-                barn.text = "消費⇒${calgary()}cal"
+                Cal.text = "摂取⇒${getInt("calory", 0)}kcal"
+                barn.text = "消費⇒${calgary()}kcal"
             }
         }
 
         super.onStart()
     }
 
-    private fun calgary() = stepcount.let { 1.05 * (3 * hohaba * it) * weight }.toInt()
+    private fun calgary() = (stepcount.let { 1.05 * (3 * hohaba * it) * weight }/1980).toInt()
 
     override val coroutineContext: CoroutineContext
         get() = Job()
@@ -308,7 +308,7 @@ class MainActivity : AppCompatActivity(), CoroutineScope, ToolsFragment.FinishBt
                 sensorcount = event.values[0].toInt()
             }
         }
-        navView.getHeaderView(0).barn.text = "消費⇒${calgary()}cal"
+        navView.getHeaderView(0).barn.text = "消費⇒${calgary()}Kcal"
     }
 
     override fun onResume() {
