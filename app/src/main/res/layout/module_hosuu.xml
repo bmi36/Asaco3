@@ -13,7 +13,7 @@
         android:layout_marginStart="3dp"
         android:layout_marginTop="3dp"
         android:layout_marginEnd="3dp"
-        android:layout_marginBottom="3dp"
+        android:layout_marginBottom="8dp"
         android:background="@android:color/white"
         android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -25,12 +25,12 @@
             android:id="@+id/hotext"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
             android:text="歩"
             android:textColor="#FF1A6F"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/calorytext"
-            app:layout_constraintTop_toBottomOf="@+id/calorytext" />
+            app:layout_constraintTop_toBottomOf="@+id/hosuu_text" />
 
         <TextView
             android:id="@+id/ho"

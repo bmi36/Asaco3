@@ -8,7 +8,6 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProviders
 import com.example.asaco2.R
 import com.example.asaco2.StepViewModel
-import com.example.asaco2.time
 import com.example.asaco2.today
 import kotlinx.android.synthetic.main.fragment_gallery.*
 import kotlinx.android.synthetic.main.module_calory.*
@@ -41,9 +40,10 @@ class GalleryFragment(val stepcount: Int,val calory: String,val dis: String) : F
         viewModel = ViewModelProviders.of(this)[StepViewModel::class.java]
 
         dayText.text = today
-        hosuu_text.text = stepcount.toString()
-        calory_text.text =  calory
-        distance_text.text = dis
+        hosuu_text.text = "$stepcount"
+        calory_text.text =  "${(calory.toDouble()/1980).toInt()}kcal"
+        distance_text.text = "${String.format("%.1f",(dis.toDouble()))}km"
+//            "${}km"
 
         listener(7)
         dayBtn.setOnClickListener { listener(7) }
@@ -66,7 +66,7 @@ class GalleryFragment(val stepcount: Int,val calory: String,val dis: String) : F
             }
 //            グラフの表示
             childFragmentManager.beginTransaction()
-                .replace(frame.id, GraphFragment(list?.toTypedArray(), time))
+                .replace(frame.id, GraphFragment(list?.toTypedArray()))
                 .commit()
         }
     }

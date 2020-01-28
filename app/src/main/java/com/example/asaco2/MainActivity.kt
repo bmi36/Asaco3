@@ -69,8 +69,8 @@ class MainActivity : AppCompatActivity(), CoroutineScope, ToolsFragment.FinishBt
     private var sensorcount: Int = -1
     private lateinit var viewModel: StepViewModel
     private var flg = false
-    private var hohaba = 0
-    private var weight = 0
+    private var hohaba: Double = 0.0
+    private var weight = 0.0
 
     private val appBarConfiguration: AppBarConfiguration by lazy {
         AppBarConfiguration(
@@ -90,17 +90,16 @@ class MainActivity : AppCompatActivity(), CoroutineScope, ToolsFragment.FinishBt
 
                         true
                     }
-
                     R.id.nav_calendar -> {
                         toolbar.title = "カレンダー"
                         action(Calendar())
                     }
-
                     R.id.nav_gallery -> {
                         toolbar.title = "歩数"
-                        action(GalleryFragment(stepcount,calgary().toString(),(hohaba*stepcount).toString()))
+                        action(GalleryFragment(stepcount,calgary().toString(),(hohaba*stepcount).toString())).also {
+                            viewModel.update(StepEntity(time.toLong(),stepcount))
+                        }
                     }
-
                     R.id.nav_tools -> {
                         toolbar.title = "設定"
                         action(ToolsFragment(this@MainActivity, navView))
@@ -276,8 +275,8 @@ class MainActivity : AppCompatActivity(), CoroutineScope, ToolsFragment.FinishBt
 
         stepcount = prefs.getInt("walk", 0)
         getSharedPreferences("User", Context.MODE_PRIVATE).run {
-            hohaba = (getString("height", "170f").toFloat().toInt() * 0.45).toInt()
-            weight = getString("weight", "60f").toFloat().toInt()
+            hohaba = (getString("height", "170f").toDouble()/100 * 0.45)
+            weight = getString("weight", "60f").toDouble()
             navView.getHeaderView(0).run {
                 Cal.text = "摂取⇒${getInt("calory", 0)}cal"
                 barn.text = "消費⇒${calgary()}cal"
@@ -287,7 +286,7 @@ class MainActivity : AppCompatActivity(), CoroutineScope, ToolsFragment.FinishBt
         super.onStart()
     }
 
-    fun calgary() = stepcount.let { 1.05 * (3 * hohaba * it) * weight }.toInt()
+    private fun calgary() = stepcount.let { 1.05 * (3 * hohaba * it) * weight }.toInt()
 
     override val coroutineContext: CoroutineContext
         get() = Job()
@@ -324,13 +323,12 @@ class MainActivity : AppCompatActivity(), CoroutineScope, ToolsFragment.FinishBt
         mSensorManager?.unregisterListener(this, mStepCounterSensor)
         if (!dayFlg.isDoneDaily()) {
             prefs.run {
-                val day = time.toLong()
-                val step = stepcount
-                viewModel.insert(StepEntity(day, step))
+                viewModel.insert(StepEntity(time.toLong(),stepcount))
                 stepcount = -1
                 edit().clear()
                     .putInt("sensor", sensorcount)
                     .apply()
+                dayFlg.execute()
             }
         } else
             prefs.edit().run {
