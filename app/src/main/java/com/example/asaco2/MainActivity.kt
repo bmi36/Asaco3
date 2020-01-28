@@ -308,7 +308,7 @@ class MainActivity : AppCompatActivity(), CoroutineScope, ToolsFragment.FinishBt
                 sensorcount = event.values[0].toInt()
             }
         }
-        navView.getHeaderView(0).barn.text = "消費⇒${calgary()}Kcal"
+        navView.getHeaderView(0).barn.text = "消費⇒${calgary()}kcal"
     }
 
     override fun onResume() {
