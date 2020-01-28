@@ -1,5 +1,6 @@
 package com.example.asaco2.ui.gallery
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -22,7 +23,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.coroutines.CoroutineContext
 
-class GalleryFragment(val stepcount: Int,val calory: String,val dis: String) : Fragment(), CoroutineScope {
+class GalleryFragment(val stepcount: Int,val calory: String,val dis: Double) : Fragment(), CoroutineScope {
 
     private lateinit var viewModel: StepViewModel
 
@@ -34,6 +35,7 @@ class GalleryFragment(val stepcount: Int,val calory: String,val dis: String) : F
         return inflater.inflate(R.layout.fragment_gallery, container, false)
     }
 
+    @SuppressLint("SetTextI18n")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -41,9 +43,8 @@ class GalleryFragment(val stepcount: Int,val calory: String,val dis: String) : F
 
         dayText.text = today
         hosuu_text.text = "$stepcount"
-        calory_text.text =  "${(calory.toDouble()/1980).toInt()}kcal"
-        distance_text.text = "${String.format("%.1f",(dis.toDouble()))}km"
-//            "${}km"
+        calory_text.text =  "${calory}kcal"
+        distance_text.text = "${dis}kcal"
 
         listener(7)
         dayBtn.setOnClickListener { listener(7) }

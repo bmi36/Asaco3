@@ -96,7 +96,7 @@ class MainActivity : AppCompatActivity(), CoroutineScope, ToolsFragment.FinishBt
                     }
                     R.id.nav_gallery -> {
                         toolbar.title = "歩数"
-                        action(GalleryFragment(stepcount,calgary().toString(),(hohaba*stepcount).toString())).also {
+                        action(GalleryFragment(stepcount,(calgary()).toString(),(hohaba*stepcount/100000))).also {
                             viewModel.update(StepEntity(time.toLong(),stepcount))
                         }
                     }
@@ -273,9 +273,9 @@ class MainActivity : AppCompatActivity(), CoroutineScope, ToolsFragment.FinishBt
         Log.d("test", stepcount.toString())
         sensorcount = prefs.getInt("sensor", 0)
 
-        stepcount = prefs.getInt("walk", 0)
+        stepcount = prefs.getInt("walk", -1)
         getSharedPreferences("User", Context.MODE_PRIVATE).run {
-            hohaba = (getString("height", "170f").toDouble()/100 * 0.45)
+            hohaba = (getString("height", "170f").toDouble() * 0.45)
             weight = getString("weight", "60f").toDouble()
             navView.getHeaderView(0).run {
                 Cal.text = "摂取⇒${getInt("calory", 0)}kcal"
@@ -286,11 +286,10 @@ class MainActivity : AppCompatActivity(), CoroutineScope, ToolsFragment.FinishBt
         super.onStart()
     }
 
-    private fun calgary() = (stepcount.let { 1.05 * (3 * hohaba * it) * weight }/1980).toInt()
+    private fun calgary() = (stepcount.let { 1.05 * (3 * hohaba * it) * weight }/198000).toInt()
 
     override val coroutineContext: CoroutineContext
         get() = Job()
-
 
     override fun onClick() {
         toolbar.title = "カレンダー"
@@ -324,9 +323,9 @@ class MainActivity : AppCompatActivity(), CoroutineScope, ToolsFragment.FinishBt
         if (!dayFlg.isDoneDaily()) {
             prefs.run {
                 viewModel.insert(StepEntity(time.toLong(),stepcount))
-                stepcount = -1
                 edit().clear()
                     .putInt("sensor", sensorcount)
+                    .putInt("walk",stepcount)
                     .apply()
                 dayFlg.execute()
             }
@@ -337,14 +336,6 @@ class MainActivity : AppCompatActivity(), CoroutineScope, ToolsFragment.FinishBt
                 putInt("walk", stepcount)
                 apply()
             }
-    }
-
-    private fun StepViewModel.UpdateOrInsert(entity: StepEntity) {
-        try {
-            insert(entity)
-        } catch (e: Exception) {
-            update(entity)
-        }
     }
 }
 
