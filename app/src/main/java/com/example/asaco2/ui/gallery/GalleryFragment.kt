@@ -54,10 +54,9 @@ class GalleryFragment(private val stepCount: Int, private val calory: String, pr
     }
 
     private fun listener(size: Int) {
-        val search: Int = when (size) {
-            7 -> day.replaceInt()
-            12 -> month.replaceInt()
-            else -> 0
+        val search: String = when (size) {
+            7 -> day
+            else -> month
         }
 
         launch(Default) {
@@ -70,7 +69,7 @@ class GalleryFragment(private val stepCount: Int, private val calory: String, pr
 
             //            グラフの表示
             childFragmentManager.beginTransaction()
-                .replace(frame.id, GraphFragment(list?.toTypedArray(),search)).commit()
+                .replace(frame.id, GraphFragment(list?.toTypedArray(),size,search)).commit()
         }
     }
 
@@ -81,8 +80,10 @@ class GalleryFragment(private val stepCount: Int, private val calory: String, pr
 
 private val currentTimeMillis = Date(System.currentTimeMillis())
 
-private val day: String = SimpleDateFormat("yyyyMMdd").run { format(currentTimeMillis) }
+@SuppressLint("SimpleDateFormat")
+private val day: String = SimpleDateFormat("yyyy/MM/dd").run { format(currentTimeMillis) }
 
+@SuppressLint("SimpleDateFormat")
 private val month: String = SimpleDateFormat("yyyy/MM").run { format(currentTimeMillis) }
 
 private fun String.replaceInt() = this.replace("/", "").toInt()
