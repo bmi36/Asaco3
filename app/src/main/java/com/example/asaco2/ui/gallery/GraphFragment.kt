@@ -15,7 +15,7 @@ import kotlinx.coroutines.*
 import kotlin.collections.ArrayList
 import kotlin.coroutines.CoroutineContext
 
-class GraphFragment(private val list: Array<Float>?) : Fragment(), CoroutineScope {
+class GraphFragment(private val list: Array<Float>?,private val size: Int) : Fragment(), CoroutineScope {
 
 
     override fun onCreateView(
@@ -24,9 +24,9 @@ class GraphFragment(private val list: Array<Float>?) : Fragment(), CoroutineScop
         savedInstanceState: Bundle?
     ): View? = inflater.inflate(R.layout.graph_fragment, container, false)
 
-    var barChar: ArrayList<BarEntry>? = null
+    var barChar: ArrayList<BarEntry>? = ArrayList(size)
 
-    private var nameList: ArrayList<String>? = null
+    private var nameList: ArrayList<String>? = ArrayList(size)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -51,13 +51,13 @@ class GraphFragment(private val list: Array<Float>?) : Fragment(), CoroutineScop
     }
 
     //    表示するやつを作るやつ
-    private fun action() = launch (Dispatchers.Default) {
+    private fun action(){
         list?.let {
             if (list.isNotEmpty())
                 for (i in list.indices) {
                     list[i].let {
-                        barChar = arrayListOf(BarEntry(it, i))
-                        nameList = arrayListOf(i.toString())
+                        barChar?.add(BarEntry(it, i))
+                        nameList?.add(i.toString())
                     }
                 }
         }

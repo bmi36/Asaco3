@@ -23,7 +23,8 @@ import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.coroutines.CoroutineContext
 
-class GalleryFragment(val stepcount: Int,val calory: String,val dis: Double) : Fragment(), CoroutineScope {
+class GalleryFragment(private val stepCount: Int, private val calory: String, private val dis: Double) : Fragment(),
+    CoroutineScope {
 
     private lateinit var viewModel: StepViewModel
 
@@ -42,9 +43,9 @@ class GalleryFragment(val stepcount: Int,val calory: String,val dis: Double) : F
         viewModel = ViewModelProviders.of(this)[StepViewModel::class.java]
 
         dayText.text = today
-        hosuu_text.text = "$stepcount"
-        calory_text.text =  "${calory}kcal"
-        distance_text.text = "${dis}kcal"
+        hosuu_text.text = "$stepCount"
+        calory_text.text = "${calory}kcal"
+        distance_text.text = "${String.format("%.1f", dis)}kcal"
 
         listener(7)
         dayBtn.setOnClickListener { listener(7) }
@@ -60,15 +61,15 @@ class GalleryFragment(val stepcount: Int,val calory: String,val dis: Double) : F
 
         launch(Default) {
             //        リストの生成（1週間or12か月）
-            val list: List<Float>? = when(size) {
+            val list: List<Float>? = when (size) {
                 7 -> viewModel.getStep(search.toLong()).map { it.toFloat() }
                 12 -> viewModel.getmonth(search.toLong()).map { it.toFloat() }
                 else -> null
             }
-//            グラフの表示
+
+            //            グラフの表示
             childFragmentManager.beginTransaction()
-                .replace(frame.id, GraphFragment(list?.toTypedArray()))
-                .commit()
+                .replace(frame.id, GraphFragment(list?.toTypedArray(),search)).commit()
         }
     }
 
@@ -81,4 +82,3 @@ private val currentTimeMillis = Date(System.currentTimeMillis())
 private val day: String = SimpleDateFormat("yyyyMMdd").run { format(currentTimeMillis) }
 private val month: String = SimpleDateFormat("yyyy/MM").run { format(currentTimeMillis) }
 private fun String.replaceInt() = this.replace("/", "").toInt()
-private val year: String = SimpleDateFormat("yyyy").run { format(currentTimeMillis) }
