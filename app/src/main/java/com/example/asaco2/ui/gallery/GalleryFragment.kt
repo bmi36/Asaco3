@@ -62,8 +62,8 @@ class GalleryFragment(private val stepCount: Int, private val calory: String, pr
         launch(Default) {
             //        リストの生成（1週間or12か月）
             val list: List<Float>? = when (size) {
-                7 -> viewModel.getStep(search.toLong()).map { it.toFloat() }
-                12 -> viewModel.getmonth(search.toLong()).map { it.toFloat() }
+                7 -> viewModel.getStep(search.replaceInt().toLong()).map { it.toFloat() }
+                12 -> viewModel.getmonth(search.replaceInt().toLong()).map { it.toFloat() }
                 else -> null
             }
 
