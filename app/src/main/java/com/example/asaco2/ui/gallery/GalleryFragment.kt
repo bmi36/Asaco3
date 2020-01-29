@@ -24,6 +24,7 @@ import java.util.*
 import kotlin.coroutines.CoroutineContext
 
 class GalleryFragment(private val stepCount: Int, private val calory: String, private val dis: Double) : Fragment(),
+
     CoroutineScope {
 
     private lateinit var viewModel: StepViewModel
@@ -79,6 +80,9 @@ class GalleryFragment(private val stepCount: Int, private val calory: String, pr
 }
 
 private val currentTimeMillis = Date(System.currentTimeMillis())
+
 private val day: String = SimpleDateFormat("yyyyMMdd").run { format(currentTimeMillis) }
+
 private val month: String = SimpleDateFormat("yyyy/MM").run { format(currentTimeMillis) }
+
 private fun String.replaceInt() = this.replace("/", "").toInt()
