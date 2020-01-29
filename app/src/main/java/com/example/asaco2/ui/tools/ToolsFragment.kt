@@ -37,8 +37,7 @@ class ToolsFragment(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? =
-        inflater.inflate(R.layout.fragment_tools, container, false)
+    ): View? = inflater.inflate(R.layout.fragment_tools, container, false)
 
     @SuppressLint("SetTextI18n", "WrongConstant")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

@@ -13,6 +13,7 @@ import com.example.asaco2.today
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import kotlinx.android.synthetic.main.fragment_home.*
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlin.coroutines.CoroutineContext
@@ -48,14 +49,14 @@ class Calendar : Fragment(), CoroutineScope {
                 calendaredModel =ViewModelProviders.of(this)[CalendarViewModel::class.java]
                  stepModel = ViewModelProviders.of(this)[StepViewModel::class.java]
             } ?: throw Exception("Invalid Activity")
-            launch {
+            launch(Dispatchers.Default) {
                 val element = calendaredModel.getCalendar(id)
-                val step = stepModel.getsum(id)
+                val step = stepModel.getsum(id)[0]
                 if (element != null) {
                     if (element.isNotEmpty()) {
                         activity?.run {
                             supportFragmentManager.beginTransaction()
-                                .replace(include_frame.id, BottomSheetFragment(element, dayString))
+                                .replace(include_frame.id, BottomSheetFragment(element, dayString,step))
                                 .commit()
                         }
                         bottomsheetBehavior.state =
@@ -64,7 +65,6 @@ class Calendar : Fragment(), CoroutineScope {
                 } else if (bottomsheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED) {
                     bottomsheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
                 }
-
             }
         }
     }
