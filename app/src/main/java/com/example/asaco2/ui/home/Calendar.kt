@@ -51,12 +51,12 @@ class Calendar : Fragment(), CoroutineScope {
             } ?: throw Exception("Invalid Activity")
             launch(Dispatchers.Default) {
                 val element = calendaredModel.getCalendar(id)
-                val step = stepModel.getsum(id)[0]
+                val step = stepModel.getDayEntity(id)
                 if (element != null) {
                     if (element.isNotEmpty()) {
                         activity?.run {
                             supportFragmentManager.beginTransaction()
-                                .replace(include_frame.id, BottomSheetFragment(element, dayString,step))
+                                .replace(include_frame.id, BottomSheetFragment(element, dayString,step.step))
                                 .commit()
                         }
                         bottomsheetBehavior.state =

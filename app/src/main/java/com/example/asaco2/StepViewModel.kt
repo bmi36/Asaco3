@@ -16,10 +16,11 @@ class StepViewModel(application: Application) : AndroidViewModel(application){
 
     fun getStep(id: Long) = runBlocking { getsum(id) }
     fun getMonth(year: Long) = runBlocking { getmonth(year) }
+    fun getDayEntity(id: Long) = runBlocking { getdayentity(id) }
 
     fun insert(entity: StepEntity) = viewModelScope.launch { repository.insert(entity) }
     fun update(entity: StepEntity) = viewModelScope.launch{ repository.update(entity) }
-    suspend fun getsum(id: Long): Array<Int> = withContext(Dispatchers.Default) { repository.getsum(id) }
-
+    suspend fun getsum(id: Long): Array<Int>? = withContext(Dispatchers.Default) { repository.getsum(id) }
     suspend fun getmonth(year: Long): Array<Int> = withContext(Dispatchers.Default){ repository.getMonth(year) }
+    suspend fun getdayentity(id: Long): StepEntity = withContext(Dispatchers.Default){ repository.getDayEntity(id) }
 }

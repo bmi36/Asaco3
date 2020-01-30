@@ -18,4 +18,7 @@ interface StepDao{
 
     @Query("select sum(step) from entity where data between :year || 01 || '%' and :year || 12 || '%' group by data")
     suspend fun getMonth(year: Long): Array<Int>
+
+    @Query("select * from entity where data like :data || '%'")
+    fun getDayEntity(data: Long): StepEntity
 }
