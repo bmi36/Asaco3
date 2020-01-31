@@ -44,7 +44,7 @@ class GalleryFragment(private val stepCount: Int, private val calory: String, pr
         dayText.text = today
         hosuu_text.text = stepCount.toString()
         calory_text.text = getString(R.string.kcal,calory)
-        distance_text.text = getString(R.string.kcal,String.format("%.1f", dis))
+        distance_text.text = getString(R.string.km,String.format("%.1f", dis))
 
         listener(7)
         dayBtn.setOnClickListener { listener(7) }
@@ -52,9 +52,10 @@ class GalleryFragment(private val stepCount: Int, private val calory: String, pr
     }
 
     private fun listener(size: Int) {
+        val currentTimeMillis = Date(System.currentTimeMillis())
         val search: String = when (size) {
-            7 -> day
-            else -> month
+            7 -> SimpleDateFormat("yyyy/MM/dd", Locale.US).run { format(currentTimeMillis) }
+            else -> SimpleDateFormat("yyyy/MM", Locale.US).run { format(currentTimeMillis) }
         }
 
         launch(Default) {
@@ -67,7 +68,7 @@ class GalleryFragment(private val stepCount: Int, private val calory: String, pr
 
             //            グラフの表示
             childFragmentManager.beginTransaction()
-                .replace(frame.id, GraphFragment(list?.toTypedArray(),size,search)).commit()
+                .replace(frame.id, GraphFragment(list?.toTypedArray(),size,currentTimeMillis)).commit()
         }
     }
 
@@ -75,11 +76,4 @@ class GalleryFragment(private val stepCount: Int, private val calory: String, pr
         get() = Job()
 
 }
-
-private val currentTimeMillis = Date(System.currentTimeMillis())
-
-private val day: String = SimpleDateFormat("yyyy/MM/dd", Locale.US).run { format(currentTimeMillis) }
-
-private val month: String = SimpleDateFormat("yyyy/MM", Locale.US).run { format(currentTimeMillis) }
-
 private fun String.replaceInt() = this.replace("/", "").toInt()

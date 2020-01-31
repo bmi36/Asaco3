@@ -12,12 +12,13 @@ import com.github.mikephil.charting.data.BarEntry
 import com.github.mikephil.charting.utils.ColorTemplate
 import kotlinx.android.synthetic.main.graph_fragment.*
 import kotlinx.coroutines.*
+import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.coroutines.CoroutineContext
 
 class GraphFragment(
-    private val list: Array<Float>?, private val size: Int, search: String
+    private val list: Array<Float>?, private val size: Int, val search: Date
 ) : Fragment(), CoroutineScope {
 
     override fun onCreateView(
@@ -49,7 +50,10 @@ class GraphFragment(
         chart.animateY(1000)
     }
 
-    private var word = search.split("/").last().toInt()
+//    private var word = search.split("/").last().toInt()
+
+    private val calendar = Calendar.getInstance()
+
     //    表示するやつを作るやつ
     private fun action() {
 
@@ -57,20 +61,26 @@ class GraphFragment(
             if (it.isNotEmpty()) {
                 for (i in 0..it.lastIndex) {
                     addlist(i, it[i])
-                    if (word < 0) break
                 }
             }
         }
     }
 
     fun addlist(index: Int, element: Float) {
+        calendar.time = search
+        var strDate: String
         val unit = when (size) {
-            7 -> getString(R.string.Day)
-            else -> getString(R.string.Month)
+            7 -> getString(R.string.Day).also {
+                strDate = SimpleDateFormat("yyyy/MM/dd", Locale.US).run { format(calendar) }
+                calendar.add(Calendar.DATE,-1)
+            }
+            else -> getString(R.string.Month).also {
+                strDate = SimpleDateFormat("yyyy/MM", Locale.US).run { format(calendar) }
+                calendar.add(Calendar.MONTH,-1)
+            }
         }
         barChar.add(BarEntry(element,index))
-        nameList.add(index,"$word$unit")
-        word--
+        nameList.add(index,"$strDate$unit")
     }
 
     override val coroutineContext: CoroutineContext
