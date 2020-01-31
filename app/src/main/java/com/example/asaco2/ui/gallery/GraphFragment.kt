@@ -12,11 +12,12 @@ import com.github.mikephil.charting.data.BarEntry
 import com.github.mikephil.charting.utils.ColorTemplate
 import kotlinx.android.synthetic.main.graph_fragment.*
 import kotlinx.coroutines.*
+import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.coroutines.CoroutineContext
 
 class GraphFragment(
-    private val list: Array<Float>?, private val size: Int, private val search: String
+    private val list: Array<Float>?, private val size: Int, search: String
 ) : Fragment(), CoroutineScope {
 
     override fun onCreateView(
@@ -25,16 +26,16 @@ class GraphFragment(
         savedInstanceState: Bundle?
     ): View? = inflater.inflate(R.layout.graph_fragment, container, false)
 
-    private var barChar: ArrayList<BarEntry>? = ArrayList(size)
+    private val barChar: ArrayList<BarEntry> = ArrayList(size)
 
-    private var nameList: ArrayList<String>? = ArrayList(size)
+    private val nameList: ArrayList<String> = ArrayList(size)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         launch {
             action()
-            barChar?.let {
+            barChar.let {
                 if (it.size != 0) {
                     val barDataSet = BarDataSet(it, "Cels")
                     val barData = BarData(nameList, barDataSet)
@@ -53,18 +54,10 @@ class GraphFragment(
     private fun action() {
 
         list?.let {
-
-            if (list.isNotEmpty()) {
-                for (i in list.indices) {
-                    addlist(i, list[i])
+            if (it.isNotEmpty()) {
+                for (i in 0..it.lastIndex) {
+                    addlist(i, it[i])
                     if (word < 0) break
-                }
-                when (val lost: Int = size - list.size) {
-                    0 -> Unit
-                    else -> for (i in lost..0) {
-                        addlist(list.lastIndex + 1, 0f)
-                        if (word < 0) break
-                    }
                 }
             }
         }
@@ -75,8 +68,8 @@ class GraphFragment(
             7 -> "日"
             else -> "月"
         }
-        barChar?.add(BarEntry(element, index))
-        nameList?.add("$word$unit")
+        barChar.add(BarEntry(element,index))
+        nameList.add(index,"$word$unit")
         word--
     }
 

@@ -44,6 +44,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import java.io.File
+import java.lang.Exception
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.coroutines.CoroutineContext
@@ -96,9 +97,13 @@ class MainActivity : AppCompatActivity(), CoroutineScope, ToolsFragment.FinishBt
                     }
                     R.id.nav_gallery -> {
                         toolbar.title = "歩数"
-                        action(GalleryFragment(stepcount,(calgary()).toString(),(hohaba*stepcount/100000))).also {
-                            viewModel.update(StepEntity(time.toLong(),stepcount))
-                        }
+                        action(
+                            GalleryFragment(
+                                stepcount,
+                                (calgary()).toString(),
+                                (hohaba * stepcount / 100000)
+                            )
+                        ).also { viewModel.update(StepEntity(time.toLong(), stepcount)) }
                     }
                     R.id.nav_tools -> {
                         toolbar.title = "設定"
@@ -154,6 +159,7 @@ class MainActivity : AppCompatActivity(), CoroutineScope, ToolsFragment.FinishBt
         setHeader(navView)
         navView.setCheckedItem(R.id.nav_calendar)
         action(Calendar())
+        dayFlg.execute()
     }
 
     override fun onSupportNavigateUp(): Boolean =
@@ -282,11 +288,10 @@ class MainActivity : AppCompatActivity(), CoroutineScope, ToolsFragment.FinishBt
                 barn.text = "消費⇒${calgary()}kcal"
             }
         }
-
         super.onStart()
     }
 
-    private fun calgary() = (stepcount.let { 1.05 * (3 * hohaba * it) * weight }/198000).toInt()
+    private fun calgary() = (stepcount.let { 1.05 * (3 * hohaba * it) * weight } / 198000).toInt()
 
     override val coroutineContext: CoroutineContext
         get() = Job()
@@ -304,10 +309,14 @@ class MainActivity : AppCompatActivity(), CoroutineScope, ToolsFragment.FinishBt
         when (event.sensor.type) {
             Sensor.TYPE_STEP_COUNTER -> {
                 stepcount++
-                sensorcount = event.values[0].toInt()
+                when(val gap = event.values[0].toInt() - sensorcount) {
+                    0 -> sensorcount = event.values[0].toInt()
+                    else -> stepcount+ gap
+                }
             }
         }
         navView.getHeaderView(0).barn.text = "消費⇒${calgary()}kcal"
+        InsertOrUpdate()
     }
 
     override fun onResume() {
@@ -319,19 +328,22 @@ class MainActivity : AppCompatActivity(), CoroutineScope, ToolsFragment.FinishBt
     //    歩数の保存するやつ
     override fun onStop() {
         super.onStop()
+        InsertOrUpdate()
+    }
+
+    fun InsertOrUpdate(){
         mSensorManager?.unregisterListener(this, mStepCounterSensor)
+
         if (!dayFlg.isDoneDaily()) {
             prefs.run {
-                viewModel.insert(StepEntity(time.toLong(),stepcount))
+                viewModel.insert(StepEntity(time.toLong(), stepcount))
                 edit().clear()
                     .putInt("sensor", sensorcount)
-                    .putInt("walk",stepcount)
                     .apply()
-                dayFlg.execute()
             }
         } else
             prefs.edit().run {
-                viewModel.update(StepEntity(time.toLong(),stepcount))
+                viewModel.update(StepEntity(time.toLong(), stepcount))
                 putInt("sensor", sensorcount)
                 putInt("walk", stepcount)
                 apply()

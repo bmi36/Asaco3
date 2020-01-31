@@ -7,7 +7,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
-import java.sql.SQLException
 
 class StepViewModel(application: Application) : AndroidViewModel(application){
     private val repository: StepRepository = StepDataBase.getInstance(application).dao().let {
