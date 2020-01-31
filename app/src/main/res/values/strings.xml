@@ -29,12 +29,32 @@
     <string name="bottom_sheet_dialog">Bottom Sheet Dialog</string>
     <string name="bottom_sheet">Bottom Sheet</string>
     <string name="let_s_join_our_community_on_slack2">Let\'s Join our Community on Slack</string>
-    <string name="instance_nowtext">○○○○年○○月○○日</string>
+    <string name="instance_nowtext">%1$s年%2$s月%3$s日</string>
     <string name="nemu">・メニュー</string>
     <string name="walkText">・歩数</string>
     <string name="weight_kg">体重(kg)：</string>
     <string name="age">年齢：</string>
     <string name="mail">男</string>
     <string name="famail">女</string>
+    <string name="calendar">カレンダー</string>
+    <string name="hosuu">歩数</string>
+    <string name="setting">設定</string>
+    <string name="barnText">消費⇒%skcal</string>
+    <string name="calText">"摂取⇒%skcal"</string>
+    <string name="conp">完了しました</string>
+    <string name="Day">日</string>
+    <string name="Month">月</string>
+    <string name="kcal">%skcal</string>
+    <string name="sumText">合計：%skcal</string>
+    <string name="walkCalText">%s歩</string>
+    <string name="total">カロリー差：%skcal</string>
+    <string name="bmi">"BMI:%s"</string>
+    <string name="error">もう一度やり直してください</string>
+    <string name="distanceText">距離</string>
+    <string name="dayText">Day</string>
+    <string name="monthText">MONTH</string>
+    <string name="step">歩</string>
+    <string name="camera">撮影</string>
+
 
 </resources>

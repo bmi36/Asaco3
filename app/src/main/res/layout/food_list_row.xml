@@ -10,7 +10,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
-        android:text="アメリカンドック"
         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/foodCalText"
@@ -22,9 +21,8 @@
         android:id="@+id/foodCalText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="332cal"
         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-        android:textSize="21dp"
+        android:textSize="21sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />

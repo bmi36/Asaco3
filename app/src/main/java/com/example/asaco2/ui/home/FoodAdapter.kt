@@ -11,7 +11,7 @@ import com.example.asaco2.R
 
 
 class FoodAdapter(
-    context: Context,
+    val context: Context,
     private val list: Array<CalendarEntity>
 ) : RecyclerView.Adapter<FoodListViewHolder>() {
 
@@ -26,11 +26,10 @@ class FoodAdapter(
 
     override fun getItemCount(): Int = list.size
 
-    @SuppressLint("SetTextI18n")
     override fun onBindViewHolder(holder: FoodListViewHolder, position: Int) =
         list[position].let {
             holder.foodText.text = it.food
-            holder.calText.text = it.absorption.toString()+"cal"
+            holder.calText.text =  context.getString(R.string.kcal,it.absorption.toString())
         }
 }
 

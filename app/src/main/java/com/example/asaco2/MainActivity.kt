@@ -1,7 +1,6 @@
 package com.example.asaco2
 
 import android.Manifest
-import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.ContentValues
 import android.content.Context
@@ -13,7 +12,6 @@ import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
@@ -38,13 +36,11 @@ import com.example.asaco2.ui.tools.ToolsFragment
 import com.google.android.material.navigation.NavigationView
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.app_bar_main.*
-import kotlinx.android.synthetic.main.fragment_tools.*
 import kotlinx.android.synthetic.main.nav_header_main.view.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import java.io.File
-import java.lang.Exception
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.coroutines.CoroutineContext
@@ -92,11 +88,11 @@ class MainActivity : AppCompatActivity(), CoroutineScope, ToolsFragment.FinishBt
                         true
                     }
                     R.id.nav_calendar -> {
-                        toolbar.title = "カレンダー"
+                        toolbar.title = getString(R.string.calendar)
                         action(Calendar())
                     }
                     R.id.nav_gallery -> {
-                        toolbar.title = "歩数"
+                        toolbar.title = getString(R.string.hosuu)
                         action(
                             GalleryFragment(
                                 stepcount,
@@ -106,7 +102,7 @@ class MainActivity : AppCompatActivity(), CoroutineScope, ToolsFragment.FinishBt
                         ).also { viewModel.update(StepEntity(time.toLong(), stepcount)) }
                     }
                     R.id.nav_tools -> {
-                        toolbar.title = "設定"
+                        toolbar.title = getString(R.string.setting)
                         action(ToolsFragment(this@MainActivity, navView))
                     }
                     else -> action(null)
@@ -120,17 +116,16 @@ class MainActivity : AppCompatActivity(), CoroutineScope, ToolsFragment.FinishBt
         setTheme(R.style.AppTheme_NoActionBar)
         setContentView(R.layout.activity_main)
 
-        if (Build.VERSION.SDK_INT >= 23) {
-            permissions =
-                arrayOf(Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-        }
+        permissions =
+            arrayOf(Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+
         checkPermission(permissions, REQUEST_CODE)
 
         launch {
             mSensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
             mStepCounterSensor = mSensorManager?.getDefaultSensor(Sensor.TYPE_STEP_COUNTER)
         }
-        title = "カレンダー画面"
+        title = getString(R.string.calendar)
 
         setSupportActionBar(toolbar)
 
@@ -238,8 +233,7 @@ class MainActivity : AppCompatActivity(), CoroutineScope, ToolsFragment.FinishBt
     }
 
     //スライドメニューのへっだーのやつ
-    @SuppressLint("SetTextI18n")
-    fun setHeader(navView: NavigationView) {
+    private fun setHeader(navView: NavigationView) {
         getSharedPreferences("User", Context.MODE_PRIVATE).let { data ->
 
             LayoutInflater.from(this).inflate(R.layout.nav_header_main, navView, false).run {
@@ -273,7 +267,6 @@ class MainActivity : AppCompatActivity(), CoroutineScope, ToolsFragment.FinishBt
 
     private val dayFlg = DayilyEventController(0, 0)
 
-    @SuppressLint("SetTextI18n", "CommitPrefEdits")
     override fun onStart() {
 
         Log.d("test", stepcount.toString())
@@ -281,11 +274,11 @@ class MainActivity : AppCompatActivity(), CoroutineScope, ToolsFragment.FinishBt
 
         stepcount = prefs.getInt("walk", -1)
         getSharedPreferences("User", Context.MODE_PRIVATE).run {
-            hohaba = (getString("height", "170f").toDouble() * 0.45)
-            weight = getString("weight", "60f").toDouble()
+            hohaba = (getString("height", "170")?.toDouble() ?: 0.0 * 0.45)
+            weight = getString("weight", "60")?.toDouble() ?: 0.0
             navView.getHeaderView(0).run {
-                Cal.text = "摂取⇒${getInt("calory", 0)}kcal"
-                barn.text = "消費⇒${calgary()}kcal"
+                Cal.text = getString(R.string.calText,getInt("calory", 0).toString())
+                barn.text = getString(R.string.barnText,calgary().toString())
             }
         }
         super.onStart()
@@ -309,14 +302,14 @@ class MainActivity : AppCompatActivity(), CoroutineScope, ToolsFragment.FinishBt
         when (event.sensor.type) {
             Sensor.TYPE_STEP_COUNTER -> {
                 stepcount++
-                when(val gap = event.values[0].toInt() - sensorcount) {
+                when (val gap = event.values[0].toInt() - sensorcount) {
                     0 -> sensorcount = event.values[0].toInt()
-                    else -> stepcount+ gap
+                    else -> stepcount + gap
                 }
             }
         }
-        navView.getHeaderView(0).barn.text = "消費⇒${calgary()}kcal"
-        InsertOrUpdate()
+        navView.getHeaderView(0).barn.text = calgary().toString()
+        UandI()
     }
 
     override fun onResume() {
@@ -328,10 +321,10 @@ class MainActivity : AppCompatActivity(), CoroutineScope, ToolsFragment.FinishBt
     //    歩数の保存するやつ
     override fun onStop() {
         super.onStop()
-        InsertOrUpdate()
+        UandI()
     }
 
-    fun InsertOrUpdate(){
+    private fun UandI() {
         mSensorManager?.unregisterListener(this, mStepCounterSensor)
 
         if (!dayFlg.isDoneDaily()) {
@@ -360,5 +353,7 @@ fun hideKeyboard(activity: Activity) {
     }
 }
 
-val time: String = SimpleDateFormat("yyyyMMdd").run { format(Date(System.currentTimeMillis())) }
-val today: String = SimpleDateFormat("yyyy年MM月dd日").run { format(Date(System.currentTimeMillis())) }
+val time: String =
+    SimpleDateFormat("yyyyMMdd", Locale.US).run { format(Date(System.currentTimeMillis())) }
+val today: String =
+    SimpleDateFormat("yyyy年MM月dd日", Locale.US).run { format(Date(System.currentTimeMillis())) }

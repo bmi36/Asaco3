@@ -65,8 +65,8 @@ class GraphFragment(
 
     fun addlist(index: Int, element: Float) {
         val unit = when (size) {
-            7 -> "日"
-            else -> "月"
+            7 -> getString(R.string.Day)
+            else -> getString(R.string.Month)
         }
         barChar.add(BarEntry(element,index))
         nameList.add(index,"$word$unit")

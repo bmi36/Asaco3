@@ -47,9 +47,9 @@
         android:id="@+id/okbutton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Button"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:text="Button" />
 
     <EditText
         android:id="@+id/cooknametext"
@@ -62,7 +62,9 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="@+id/caltext"
-        app:layout_constraintTop_toTopOf="@+id/nameText" />
+        app:layout_constraintTop_toTopOf="@+id/nameText"
+        android:importantForAutofill="no"
+        android:hint="@string/errortext"/>
 
     <EditText
         android:id="@+id/caltext"
@@ -74,7 +76,9 @@
         app:layout_constraintBottom_toBottomOf="@+id/caloryText"
         app:layout_constraintStart_toEndOf="@+id/caloryText"
         app:layout_constraintTop_toTopOf="@+id/caloryText"
-        android:inputType="number"/>
+        android:inputType="number"
+        android:hint="@string/errortext"
+        android:importantForAutofill="no" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

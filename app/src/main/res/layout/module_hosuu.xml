@@ -25,11 +25,10 @@
             android:id="@+id/hotext"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="歩"
+            android:text="@string/step"
             android:textColor="#FF1A6F"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/calorytext"
             app:layout_constraintTop_toBottomOf="@+id/hosuu_text" />
 
         <TextView
@@ -38,7 +37,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
-            android:text="歩数"
+            android:text="@string/hosuu"
             android:textAppearance="@style/TextAppearance.AppCompat.Large"
             android:textColor="#FF1A6F"
             app:layout_constraintStart_toStartOf="parent"
@@ -50,7 +49,6 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
             android:layout_marginBottom="8dp"
-            android:text="4649"
             android:textAppearance="@style/TextAppearance.AppCompat.Display1"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"

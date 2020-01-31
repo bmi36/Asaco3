@@ -42,7 +42,7 @@ class Calendar : Fragment(), CoroutineScope {
 
             val strMonth = if (month > 9) "${month + 1}" else "0${month + 1}"
             val strDay = if (dayOfMonth > 9) "$dayOfMonth" else "0${dayOfMonth}"
-            val dayString = "${year}年${strMonth}月${strDay}日"
+            val dayString = getString(R.string.instance_nowtext,year.toString(),strMonth,strDay)
             val id = "$year$strMonth$strDay".toLong()
 
              activity?.run {

@@ -39,12 +39,12 @@ class BottomSheetFragment(
             total += element.absorption as Int
         }
         nowText.text = dayString
-        sumText.text = "合計：${total}cal"
-        walkCalText.text = "${step}歩"
+        sumText.text = getString(R.string.sumText,sumText)
+        walkCalText.text = getString(R.string.walkCalText,step.toString())
 
         val bmr = activity?.getSharedPreferences("User",Context.MODE_PRIVATE)?.getInt("bmr",0)
             ?: 0
 
-        totalCalText.text = "カロリー差：${total - step -bmr}cal"
+        totalCalText.text = "${total - step -bmr}"
     }
 }

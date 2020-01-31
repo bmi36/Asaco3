@@ -1,6 +1,5 @@
 package com.example.asaco2.ui.gallery
 
-import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -37,16 +36,15 @@ class GalleryFragment(private val stepCount: Int, private val calory: String, pr
         return inflater.inflate(R.layout.fragment_gallery, container, false)
     }
 
-    @SuppressLint("SetTextI18n")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         viewModel = ViewModelProviders.of(this)[StepViewModel::class.java]
 
         dayText.text = today
-        hosuu_text.text = "$stepCount"
-        calory_text.text = "${calory}kcal"
-        distance_text.text = "${String.format("%.1f", dis)}kcal"
+        hosuu_text.text = stepCount.toString()
+        calory_text.text = getString(R.string.kcal,calory)
+        distance_text.text = getString(R.string.kcal,String.format("%.1f", dis))
 
         listener(7)
         dayBtn.setOnClickListener { listener(7) }
@@ -80,10 +78,8 @@ class GalleryFragment(private val stepCount: Int, private val calory: String, pr
 
 private val currentTimeMillis = Date(System.currentTimeMillis())
 
-@SuppressLint("SimpleDateFormat")
-private val day: String = SimpleDateFormat("yyyy/MM/dd").run { format(currentTimeMillis) }
+private val day: String = SimpleDateFormat("yyyy/MM/dd", Locale.US).run { format(currentTimeMillis) }
 
-@SuppressLint("SimpleDateFormat")
-private val month: String = SimpleDateFormat("yyyy/MM").run { format(currentTimeMillis) }
+private val month: String = SimpleDateFormat("yyyy/MM", Locale.US).run { format(currentTimeMillis) }
 
 private fun String.replaceInt() = this.replace("/", "").toInt()

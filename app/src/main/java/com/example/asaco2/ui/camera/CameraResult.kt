@@ -25,7 +25,6 @@ import kotlin.coroutines.CoroutineContext
 
 class CameraResult : AppCompatActivity(), CoroutineScope {
 
-    //    private lateinit var viewModel: CalendarViewModel
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setTheme(R.style.AppTheme_NoActionBar)
@@ -33,7 +32,6 @@ class CameraResult : AppCompatActivity(), CoroutineScope {
 
         val fileDir = intent?.extras?.get("file") as Uri
         val file: File = fileDir.toFile()
-
         val uri = intent?.extras?.get("uri") as Uri
         frame.visibility = FrameLayout.VISIBLE
         supportFragmentManager.beginTransaction()
@@ -50,23 +48,18 @@ class CameraResult : AppCompatActivity(), CoroutineScope {
                 .sendImage(baseImage).enqueue(object : Callback<Cook> {
 
                     override fun onFailure(call: Call<Cook>, t: Throwable) {
-
-                        Log.d("test", t.message)
                         supportFragmentManager.beginTransaction()
                             .replace(frame.id, ImageFileFragment())
                             .commit()
                     }
 
                     override fun onResponse(call: Call<Cook>, response: Response<Cook>) {
-
-                        if (response.body() != null) {
-
-                            val cock = response.body() as Cook
+                        response.body()?.let {
                             supportFragmentManager.beginTransaction()
-                                .replace(frame.id, ImageSuccessFragment(uri, cock)).commit()
+                                .replace(frame.id, ImageSuccessFragment(uri, response.body() as Cook))
+                                .commit()
                         }
                     }
-
                 })
         }
     }

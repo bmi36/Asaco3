@@ -20,5 +20,5 @@ interface StepDao{
     suspend fun getMonth(year: Long): Array<Int>
 
     @Query("select * from entity where data like :data || '%'")
-    fun getDayEntity(data: Long): StepEntity
+    suspend fun getDayEntity(data: Long): StepEntity
 }

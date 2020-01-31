@@ -7,20 +7,20 @@
         <item
             android:id="@+id/nav_calendar"
             android:icon="@drawable/ic_date_range_black_24dp"
-            android:title="カレンダー画面" />
+            android:title="@string/calendar" />
         <item
             android:id="@+id/nav_gallery"
             android:icon="@drawable/ic_directions_walk_black_24dp"
-            android:title="歩数" />
+            android:title="@string/walkText" />
         <item
             android:id="@+id/nav_tools"
             android:icon="@drawable/ic_menu_manage"
-            android:title="設定" />
+            android:title="@string/setting" />
     </group>
 
         <item
             android:id="@+id/nav_slideshow"
             android:icon="@drawable/ic_menu_camera"
-            android:title="撮影" />
+            android:title="@string/camera" />
 
 </menu>
