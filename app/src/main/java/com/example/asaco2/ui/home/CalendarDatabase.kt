@@ -7,7 +7,7 @@ import androidx.room.RoomDatabase
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 
-@Database(entities = [CalendarEntity::class], version = 1)
+@Database(entities = [CalendarEntity::class], version = 1,exportSchema = false)
  abstract class CalendarDatabase : RoomDatabase(){
 
     abstract fun calendarDao(): CalendarDao

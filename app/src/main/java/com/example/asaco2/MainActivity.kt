@@ -154,7 +154,7 @@ class MainActivity : AppCompatActivity(), CoroutineScope, ToolsFragment.FinishBt
         setHeader(navView)
         navView.setCheckedItem(R.id.nav_calendar)
         action(Calendar())
-        dayFlg.execute()
+
     }
 
     override fun onSupportNavigateUp(): Boolean =
@@ -277,10 +277,13 @@ class MainActivity : AppCompatActivity(), CoroutineScope, ToolsFragment.FinishBt
             hohaba = (getString("height", "170")?.toDouble() ?: 0.0 * 0.45)
             weight = getString("weight", "60")?.toDouble() ?: 0.0
             navView.getHeaderView(0).run {
-                Cal.text = getString(R.string.calText,getInt("calory", 0).toString())
-                barn.text = getString(R.string.barnText,calgary().toString())
+                Cal.text = getString(R.string.calText, getInt("calory", 0).toString())
+                barn.text = getString(R.string.barnText, calgary().toString())
             }
         }
+
+        UpdateOrInsert()
+
         super.onStart()
     }
 
@@ -290,7 +293,7 @@ class MainActivity : AppCompatActivity(), CoroutineScope, ToolsFragment.FinishBt
         get() = Job()
 
     override fun onClick() {
-        toolbar.title = "カレンダー"
+        toolbar.title = getString(R.string.calendar)
         navView.setCheckedItem(R.id.nav_calendar)
         action(Calendar())
     }
@@ -309,7 +312,6 @@ class MainActivity : AppCompatActivity(), CoroutineScope, ToolsFragment.FinishBt
             }
         }
         navView.getHeaderView(0).barn.text = calgary().toString()
-        UandI()
     }
 
     override fun onResume() {
@@ -321,26 +323,28 @@ class MainActivity : AppCompatActivity(), CoroutineScope, ToolsFragment.FinishBt
     //    歩数の保存するやつ
     override fun onStop() {
         super.onStop()
-        UandI()
+        UpdateOrInsert()
     }
 
-    private fun UandI() {
+    private fun UpdateOrInsert() {
         mSensorManager?.unregisterListener(this, mStepCounterSensor)
+        try {
 
-        if (!dayFlg.isDoneDaily()) {
             prefs.run {
                 viewModel.insert(StepEntity(time.toLong(), stepcount))
                 edit().clear()
                     .putInt("sensor", sensorcount)
                     .apply()
+                dayFlg.execute()
             }
-        } else
+        } catch (e: Exception) {
             prefs.edit().run {
                 viewModel.update(StepEntity(time.toLong(), stepcount))
                 putInt("sensor", sensorcount)
                 putInt("walk", stepcount)
                 apply()
             }
+        }
     }
 }
 
@@ -348,7 +352,8 @@ class MainActivity : AppCompatActivity(), CoroutineScope, ToolsFragment.FinishBt
 fun hideKeyboard(activity: Activity) {
     val view = activity.currentFocus
     if (view != null) {
-        val manager = activity.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        val manager =
+            activity.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         manager.hideSoftInputFromWindow(view.windowToken, 0)
     }
 }
