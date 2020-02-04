@@ -22,4 +22,5 @@ class StepViewModel(application: Application) : AndroidViewModel(application){
     suspend fun getsum(id: Long): Array<Int>? = withContext(Dispatchers.Default) { repository.getsum(id) }
     suspend fun getmonth(year: Long): Array<Int> = withContext(Dispatchers.Default){ repository.getMonth(year) }
     suspend fun getdayentity(id: Long): StepEntity = withContext(Dispatchers.Default){ repository.getDayEntity(id) }
+    fun updateOrinsert(entity: StepEntity) = viewModelScope.launch { repository.updateOrinsert(entity) }
 }

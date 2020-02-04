@@ -15,7 +15,6 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.app.ActionBarDrawerToggle
@@ -30,10 +29,12 @@ import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import com.example.asaco2.ui.camera.CameraResult
+import com.example.asaco2.ui.camera.toJson
 import com.example.asaco2.ui.gallery.GalleryFragment
 import com.example.asaco2.ui.home.Calendar
 import com.example.asaco2.ui.tools.ToolsFragment
 import com.google.android.material.navigation.NavigationView
+import com.google.gson.Gson
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.app_bar_main.*
 import kotlinx.android.synthetic.main.nav_header_main.view.*
@@ -68,11 +69,16 @@ class MainActivity : AppCompatActivity(), CoroutineScope, ToolsFragment.FinishBt
     private var flg = false
     private var hohaba: Double = 0.0
     private var weight = 0.0
+    private lateinit var day: Date
 
     private val appBarConfiguration: AppBarConfiguration by lazy {
         AppBarConfiguration(
-            setOf(R.id.nav_calendar, R.id.nav_gallery, R.id.nav_slideshow, R.id.nav_tools),
-            drawer_layout
+            setOf(
+                R.id.nav_calendar,
+                R.id.nav_gallery,
+                R.id.nav_slideshow,
+                R.id.nav_tools
+            ), drawer_layout
         )
     }
 
@@ -84,7 +90,6 @@ class MainActivity : AppCompatActivity(), CoroutineScope, ToolsFragment.FinishBt
                     R.id.nav_slideshow -> {
                         if (flg) takePicture()
                         action(null)
-
                         true
                     }
                     R.id.nav_calendar -> {
@@ -150,11 +155,25 @@ class MainActivity : AppCompatActivity(), CoroutineScope, ToolsFragment.FinishBt
             drawer_layout.addDrawerListener(it)
             it.syncState()
         }
+        sensorcount = prefs.getInt("sensor", 0)
+
+        stepcount = prefs.getInt("walk", -1)
+        getSharedPreferences("User", Context.MODE_PRIVATE).run {
+            hohaba = (getString("height", "170")?.toDouble() ?: 0.0 * 0.45)
+            weight = getString("weight", "60")?.toDouble() ?: 0.0
+        }
         setFragment = Calendar()
         setHeader(navView)
         navView.setCheckedItem(R.id.nav_calendar)
         action(Calendar())
-
+        prefs.run {
+            day = Date(
+                getLong(
+                    "calendar", System.currentTimeMillis().also {
+                        viewModel.insert(StepEntity(it, 0))
+                    })
+            )
+        }
     }
 
     override fun onSupportNavigateUp(): Boolean =
@@ -205,6 +224,7 @@ class MainActivity : AppCompatActivity(), CoroutineScope, ToolsFragment.FinishBt
         }
     }
 
+
     //写真を撮った後のやつ
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
@@ -236,11 +256,12 @@ class MainActivity : AppCompatActivity(), CoroutineScope, ToolsFragment.FinishBt
     private fun setHeader(navView: NavigationView) {
         getSharedPreferences("User", Context.MODE_PRIVATE).let { data ->
 
-            LayoutInflater.from(this).inflate(R.layout.nav_header_main, navView, false).run {
+            LayoutInflater.from(this).inflate(R.layout.nav_header_main, navView, false)
+                .run {
 
-                this.UserName.text = data.getString("name", HUNTER)
-                navView.addHeaderView(this)
-            }
+                    this.UserName.text = data.getString("name", HUNTER)
+                    navView.addHeaderView(this)
+                }
         }
     }
 
@@ -251,7 +272,10 @@ class MainActivity : AppCompatActivity(), CoroutineScope, ToolsFragment.FinishBt
             it.put(MediaStore.Images.Media.MIME_TYPE, "image/jpg")
             it.put("_data", file.absolutePath)
         }
-        this.contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
+        this.contentResolver.insert(
+            MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+            contentValues
+        )
     }
 
     //バックボタンを押したときのやつ
@@ -265,29 +289,9 @@ class MainActivity : AppCompatActivity(), CoroutineScope, ToolsFragment.FinishBt
         }
     }
 
-    private val dayFlg = DayilyEventController(0, 0)
+    private lateinit var dayFlg: DayilyEventController
 
-    override fun onStart() {
-
-        Log.d("test", stepcount.toString())
-        sensorcount = prefs.getInt("sensor", 0)
-
-        stepcount = prefs.getInt("walk", -1)
-        getSharedPreferences("User", Context.MODE_PRIVATE).run {
-            hohaba = (getString("height", "170")?.toDouble() ?: 0.0 * 0.45)
-            weight = getString("weight", "60")?.toDouble() ?: 0.0
-            navView.getHeaderView(0).run {
-                Cal.text = getString(R.string.calText, getInt("calory", 0).toString())
-                barn.text = getString(R.string.barnText, calgary().toString())
-            }
-        }
-
-        UpdateOrInsert()
-
-        super.onStart()
-    }
-
-    private fun calgary() = (stepcount.let { 1.05 * (3 * hohaba * it) * weight } / 198000).toInt()
+    private fun calgary() = (stepcount.let { 1.05 * (3 * hohaba * it) * weight } / 200000).toInt()
 
     override val coroutineContext: CoroutineContext
         get() = Job()
@@ -299,6 +303,14 @@ class MainActivity : AppCompatActivity(), CoroutineScope, ToolsFragment.FinishBt
     }
 
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {}
+
+    override fun onStart() {
+        navView.getHeaderView(0).run {
+            Cal.text = getString(R.string.calText, prefs.getInt("calory", 0).toString())
+            barn.text = getString(R.string.barnText, calgary().toString())
+        }
+        super.onStart()
+    }
 
     //    歩数をあれするやつ
     override fun onSensorChanged(event: SensorEvent) {
@@ -323,27 +335,14 @@ class MainActivity : AppCompatActivity(), CoroutineScope, ToolsFragment.FinishBt
     //    歩数の保存するやつ
     override fun onStop() {
         super.onStop()
-        UpdateOrInsert()
-    }
-
-    private fun UpdateOrInsert() {
         mSensorManager?.unregisterListener(this, mStepCounterSensor)
-        try {
+        viewModel.updateOrinsert(StepEntity(time.toLong(), stepcount))
+        prefs.edit().run {
 
-            prefs.run {
-                viewModel.insert(StepEntity(time.toLong(), stepcount))
-                edit().clear()
-                    .putInt("sensor", sensorcount)
-                    .apply()
-                dayFlg.execute()
-            }
-        } catch (e: Exception) {
-            prefs.edit().run {
-                viewModel.update(StepEntity(time.toLong(), stepcount))
-                putInt("sensor", sensorcount)
-                putInt("walk", stepcount)
-                apply()
-            }
+            if (day == currentTimeMillis) putInt("walk", stepcount)
+
+            putInt("sensor", sensorcount)
+            apply()
         }
     }
 }
@@ -358,7 +357,11 @@ fun hideKeyboard(activity: Activity) {
     }
 }
 
+val currentTimeMillis = Date(System.currentTimeMillis())
 val time: String =
-    SimpleDateFormat("yyyyMMdd", Locale.US).run { format(Date(System.currentTimeMillis())) }
+    SimpleDateFormat("yyyyMMdd", Locale.US).run { format(currentTimeMillis) }
 val today: String =
-    SimpleDateFormat("yyyy年MM月dd日", Locale.US).run { format(Date(System.currentTimeMillis())) }
+    SimpleDateFormat("yyyy年MM月dd日", Locale.US).run { format(currentTimeMillis) }
+
+fun String.toDailyClass() = Gson().fromJson(this, DayilyEventController::class.java)
+fun DayilyEventController.toJson() = Gson().toJson(this)

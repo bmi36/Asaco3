@@ -20,15 +20,6 @@
     <string name="ok">決定</string>
     <string name="todo">TODO</string>
 
-    <string name="join_slack_community">Join Slack Community</string>
-    <string name="also_follow_us_on_twitter">Also follow us on Twitter</string>
-    <string name="let_s_join_our_community_on_slack">Let\'s Join our Community on Slack</string>
-    <string name="welcome_to_mindorks">Welcome to MindOrks!!</string>
-    <string name="this_is_persistent_bottom_sheet">This is persistent Bottom Sheet</string>
-    <string name="bottom_sheet_dialog_fragment">Bottom Sheet Dialog Fragment</string>
-    <string name="bottom_sheet_dialog">Bottom Sheet Dialog</string>
-    <string name="bottom_sheet">Bottom Sheet</string>
-    <string name="let_s_join_our_community_on_slack2">Let\'s Join our Community on Slack</string>
     <string name="instance_nowtext">%1$s年%2$s月%3$s日</string>
     <string name="nemu">・メニュー</string>
     <string name="walkText">・歩数</string>

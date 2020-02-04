@@ -59,9 +59,7 @@ class GraphFragment(
 
         list?.let {
             if (it.isNotEmpty()) {
-                for (i in 0..it.lastIndex) {
-                    addlist(i, it[i])
-                }
+                for (i in 0..it.lastIndex) { addlist(i, it[i]) }
             }
         }
     }
@@ -71,11 +69,11 @@ class GraphFragment(
         var strDate: String
         val unit = when (size) {
             7 -> getString(R.string.Day).also {
-                strDate = SimpleDateFormat("yyyy/MM/dd", Locale.US).run { format(calendar) }
+                strDate = SimpleDateFormat("yyyy/MM/dd", Locale.US).run { format(calendar.time) }
                 calendar.add(Calendar.DATE,-1)
             }
             else -> getString(R.string.Month).also {
-                strDate = SimpleDateFormat("yyyy/MM", Locale.US).run { format(calendar) }
+                strDate = SimpleDateFormat("yyyy/MM", Locale.US).run { format(calendar.time) }
                 calendar.add(Calendar.MONTH,-1)
             }
         }
