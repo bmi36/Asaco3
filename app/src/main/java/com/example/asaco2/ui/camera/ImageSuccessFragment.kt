@@ -10,6 +10,8 @@ import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 import com.example.asaco2.R
 import com.example.asaco2.ui.home.CalendarEntity
@@ -31,7 +33,7 @@ class ImageSuccessFragment(private val uri: Uri, private val cook: Cook) : Fragm
         super.onViewCreated(view, savedInstanceState)
 
         viewModel = activity?.run {
-            ViewModelProviders.of(this)[CalendarViewModel::class.java]
+           ViewModelProvider(this)[CalendarViewModel::class.java]
         } ?: throw Exception("Invalid Activity")
 
         cameraImage.run {

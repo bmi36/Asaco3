@@ -6,10 +6,9 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.widget.NestedScrollView
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
 import com.example.asaco2.R
 import com.example.asaco2.StepViewModel
-import com.example.asaco2.today
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import kotlinx.android.synthetic.main.fragment_home.*
 import kotlinx.coroutines.CoroutineScope
@@ -46,8 +45,8 @@ class Calendar : Fragment(), CoroutineScope {
             val id = "$year$strMonth$strDay".toLong()
 
              activity?.run {
-                calendaredModel =ViewModelProviders.of(this)[CalendarViewModel::class.java]
-                 stepModel = ViewModelProviders.of(this)[StepViewModel::class.java]
+                calendaredModel =ViewModelProvider(this)[CalendarViewModel::class.java]
+                 stepModel = ViewModelProvider(this)[StepViewModel::class.java]
             } ?: throw Exception("Invalid Activity")
             launch(Dispatchers.Default) {
                 val element = calendaredModel.getCalendar(id)

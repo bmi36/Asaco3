@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="@dimen/nav_header_height"
     android:background="@drawable/side_nav_bar"
@@ -17,7 +16,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingTop="@dimen/nav_header_vertical_spacing"
-        android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
+        android:textAppearance="@style/TextAppearance.AppCompat.Large" />
 
 
         <LinearLayout
@@ -29,7 +28,8 @@
                 android:id="@+id/calorytext"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/Cal" />
+                android:text="@string/Cal"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -41,13 +41,14 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    tools:text="摂取⇒125cal" />
+                    android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
+
                 <TextView
                     android:id="@+id/barn"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    tools:text="消費⇒125cal" />
+                    android:textAppearance="@style/TextAppearance.AppCompat.Small" />
             </LinearLayout>
 
             <Space
@@ -59,7 +60,8 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="@string/BMI" />
+                android:text="@string/BMI"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
 
         </LinearLayout>
 

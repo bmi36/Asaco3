@@ -5,10 +5,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProviders
-import com.example.asaco2.R
-import com.example.asaco2.StepViewModel
-import com.example.asaco2.today
+import androidx.lifecycle.ViewModelProvider
+import com.example.asaco2.*
 import kotlinx.android.synthetic.main.fragment_gallery.*
 import kotlinx.android.synthetic.main.module_calory.*
 import kotlinx.android.synthetic.main.module_distance.*
@@ -39,9 +37,9 @@ class GalleryFragment(private val stepCount: Int, private val calory: String, pr
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        viewModel = ViewModelProviders.of(this)[StepViewModel::class.java]
+        viewModel = ViewModelProvider(this)[StepViewModel::class.java]
 
-        dayText.text = today
+        dayText.text = time.toString()
         hosuu_text.text = stepCount.toString()
         calory_text.text = getString(R.string.kcal,calory)
         distance_text.text = getString(R.string.km,String.format("%.1f", dis))

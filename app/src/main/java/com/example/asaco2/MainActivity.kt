@@ -24,12 +24,11 @@ import androidx.core.content.FileProvider
 import androidx.core.net.toUri
 import androidx.core.view.GravityCompat
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import com.example.asaco2.ui.camera.CameraResult
-import com.example.asaco2.ui.camera.toJson
 import com.example.asaco2.ui.gallery.GalleryFragment
 import com.example.asaco2.ui.home.Calendar
 import com.example.asaco2.ui.tools.ToolsFragment
@@ -69,7 +68,7 @@ class MainActivity : AppCompatActivity(), CoroutineScope, ToolsFragment.FinishBt
     private var flg = false
     private var hohaba: Double = 0.0
     private var weight = 0.0
-    private lateinit var day: Date
+    private val day: Long by lazy { prefs.getLong("calendar", time) }
 
     private val appBarConfiguration: AppBarConfiguration by lazy {
         AppBarConfiguration(
@@ -104,7 +103,7 @@ class MainActivity : AppCompatActivity(), CoroutineScope, ToolsFragment.FinishBt
                                 (calgary()).toString(),
                                 (hohaba * stepcount / 100000)
                             )
-                        ).also { viewModel.update(StepEntity(time.toLong(), stepcount)) }
+                        ).also { viewModel.update(StepEntity(day, stepcount)) }
                     }
                     R.id.nav_tools -> {
                         toolbar.title = getString(R.string.setting)
@@ -142,7 +141,7 @@ class MainActivity : AppCompatActivity(), CoroutineScope, ToolsFragment.FinishBt
             drawer_layout.closeDrawer(GravityCompat.START)
 
         }
-        viewModel = ViewModelProviders.of(this)[StepViewModel::class.java]
+        viewModel = ViewModelProvider(this)[StepViewModel::class.java]
 
         //どろわーの設定
         ActionBarDrawerToggle(
@@ -167,12 +166,17 @@ class MainActivity : AppCompatActivity(), CoroutineScope, ToolsFragment.FinishBt
         navView.setCheckedItem(R.id.nav_calendar)
         action(Calendar())
         prefs.run {
-            day = Date(
-                getLong(
-                    "calendar", System.currentTimeMillis().also {
-                        viewModel.insert(StepEntity(it, 0))
-                    })
-            )
+
+            if (day == time){
+                viewModel.insert(StepEntity(time,stepcount))
+            }
+//            day = getLong("calendar", time(currentTimeMillis).toLong())
+//                Date(
+//                    getLong(
+//                        "calendar", System.currentTimeMillis().also {
+//                            viewModel.insert(StepEntity(it, 0))
+//                        })
+//                ).let { time(it).toInt() }
         }
     }
 
@@ -289,8 +293,6 @@ class MainActivity : AppCompatActivity(), CoroutineScope, ToolsFragment.FinishBt
         }
     }
 
-    private lateinit var dayFlg: DayilyEventController
-
     private fun calgary() = (stepcount.let { 1.05 * (3 * hohaba * it) * weight } / 200000).toInt()
 
     override val coroutineContext: CoroutineContext
@@ -323,7 +325,7 @@ class MainActivity : AppCompatActivity(), CoroutineScope, ToolsFragment.FinishBt
                 }
             }
         }
-        navView.getHeaderView(0).barn.text = calgary().toString()
+        navView.getHeaderView(0).barn.text = getString(R.string.barnText,calgary().toString())
     }
 
     override fun onResume() {
@@ -336,12 +338,13 @@ class MainActivity : AppCompatActivity(), CoroutineScope, ToolsFragment.FinishBt
     override fun onStop() {
         super.onStop()
         mSensorManager?.unregisterListener(this, mStepCounterSensor)
-        viewModel.updateOrinsert(StepEntity(time.toLong(), stepcount))
+        viewModel.updateOrinsert(StepEntity(day.toLong(), stepcount))
         prefs.edit().run {
 
-            if (day == currentTimeMillis) putInt("walk", stepcount)
+            if (day.toInt() == time.toInt()) putInt("walk", stepcount) else clear()
 
             putInt("sensor", sensorcount)
+            putLong("calendar",day)
             apply()
         }
     }
@@ -358,10 +361,10 @@ fun hideKeyboard(activity: Activity) {
 }
 
 val currentTimeMillis = Date(System.currentTimeMillis())
-val time: String =
-    SimpleDateFormat("yyyyMMdd", Locale.US).run { format(currentTimeMillis) }
-val today: String =
-    SimpleDateFormat("yyyy年MM月dd日", Locale.US).run { format(currentTimeMillis) }
+val time: Long =
+    SimpleDateFormat("yyyyMMdd", Locale.US).run { format(currentTimeMillis) }.toLong()
+fun today(date: Date): String =
+    SimpleDateFormat("yyyy年MM月dd日", Locale.US).run { format(date) }
 
 fun String.toDailyClass() = Gson().fromJson(this, DayilyEventController::class.java)
 fun DayilyEventController.toJson() = Gson().toJson(this)
