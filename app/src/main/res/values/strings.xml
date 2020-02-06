@@ -21,6 +21,7 @@
     <string name="todo">TODO</string>
 
     <string name="instance_nowtext">%1$s年%2$s月%3$s日</string>
+    <string name="date_string">%1$y年%2$m月%3$d日</string>
     <string name="nemu">・メニュー</string>
     <string name="walkText">・歩数</string>
     <string name="weight_kg">体重(kg)：</string>

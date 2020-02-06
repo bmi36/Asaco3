@@ -2,10 +2,7 @@ package com.example.asaco2
 
 import android.Manifest
 import android.app.Activity
-import android.content.ContentValues
-import android.content.Context
-import android.content.Intent
-import android.content.SharedPreferences
+import android.content.*
 import android.content.pm.PackageManager
 import android.hardware.Sensor
 import android.hardware.SensorEvent
@@ -14,6 +11,7 @@ import android.hardware.SensorManager
 import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
+import android.os.IBinder
 import android.provider.MediaStore
 import android.view.LayoutInflater
 import android.view.inputmethod.InputMethodManager
@@ -44,32 +42,31 @@ import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.coroutines.CoroutineContext
+import kotlin.properties.Delegates
 
 
 const val CAMERA_REQUEST_CODE = 1
 const val HUNTER = "梅田ひろし"
 
 
-class MainActivity : AppCompatActivity(), CoroutineScope, ToolsFragment.FinishBtn,
-    SensorEventListener {
+class MainActivity : AppCompatActivity(), ToolsFragment.FinishBtn {
 
     companion object {
         private const val REQUEST_CODE = 1000
     }
 
     private lateinit var setFragment: Fragment
-    private var mSensorManager: SensorManager? = null
-    private var mStepCounterSensor: Sensor? = null
     private lateinit var prefs: SharedPreferences
-    private var stepcount = -1
+    //    private var stepcount = -1
     private lateinit var permissions: Array<String>
     private var sensorcount: Int = -1
-    private lateinit var viewModel: StepViewModel
+    private val viewModel: StepViewModel by lazy {
+        ViewModelProvider(this)[StepViewModel::class.java]
+    }
     private var flg = false
     private var hohaba: Double = 0.0
     private var weight = 0.0
-    private val day: Long by lazy { prefs.getLong("calendar", time) }
-
+    private var day by Delegates.notNull<Long>()
     private val appBarConfiguration: AppBarConfiguration by lazy {
         AppBarConfiguration(
             setOf(
@@ -80,6 +77,8 @@ class MainActivity : AppCompatActivity(), CoroutineScope, ToolsFragment.FinishBt
             ), drawer_layout
         )
     }
+    private lateinit var stepService: StepService
+    private var bound = false
 
     //    ナビゲーションの初期化
     private val navView: NavigationView by lazy {
@@ -96,6 +95,7 @@ class MainActivity : AppCompatActivity(), CoroutineScope, ToolsFragment.FinishBt
                         action(Calendar())
                     }
                     R.id.nav_gallery -> {
+                        val stepcount = stepService.step
                         toolbar.title = getString(R.string.hosuu)
                         action(
                             GalleryFragment(
@@ -103,7 +103,9 @@ class MainActivity : AppCompatActivity(), CoroutineScope, ToolsFragment.FinishBt
                                 (calgary()).toString(),
                                 (hohaba * stepcount / 100000)
                             )
-                        ).also { viewModel.update(StepEntity(day, stepcount)) }
+                        ).also {
+                            viewModel.update(StepEntity(day, stepcount))
+                        }
                     }
                     R.id.nav_tools -> {
                         toolbar.title = getString(R.string.setting)
@@ -120,20 +122,19 @@ class MainActivity : AppCompatActivity(), CoroutineScope, ToolsFragment.FinishBt
         setTheme(R.style.AppTheme_NoActionBar)
         setContentView(R.layout.activity_main)
 
+        val intent = Intent(this, StepService::class.java)
+        bindService(intent, connectBind, Context.BIND_AUTO_CREATE)
+        prefs = getSharedPreferences("Cock", Context.MODE_PRIVATE)
+//        day = prefs.getLong("calendar", time.also { viewModel.insert(StepEntity(it, 0)) })
+
         permissions =
             arrayOf(Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE)
 
         checkPermission(permissions, REQUEST_CODE)
 
-        launch {
-            mSensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
-            mStepCounterSensor = mSensorManager?.getDefaultSensor(Sensor.TYPE_STEP_COUNTER)
-        }
         title = getString(R.string.calendar)
 
         setSupportActionBar(toolbar)
-
-        prefs = getSharedPreferences("Cock", Context.MODE_PRIVATE)
 
         fab.setOnClickListener {
             //カメラボタンが押されたときになんかするやつ
@@ -141,7 +142,10 @@ class MainActivity : AppCompatActivity(), CoroutineScope, ToolsFragment.FinishBt
             drawer_layout.closeDrawer(GravityCompat.START)
 
         }
-        viewModel = ViewModelProvider(this)[StepViewModel::class.java]
+
+        viewModel.allSteps.observe(this, androidx.lifecycle.Observer {
+
+        })
 
         //どろわーの設定
         ActionBarDrawerToggle(
@@ -154,9 +158,8 @@ class MainActivity : AppCompatActivity(), CoroutineScope, ToolsFragment.FinishBt
             drawer_layout.addDrawerListener(it)
             it.syncState()
         }
-        sensorcount = prefs.getInt("sensor", 0)
+//        sensorcount = prefs.getInt("sensor", 0)
 
-        stepcount = prefs.getInt("walk", -1)
         getSharedPreferences("User", Context.MODE_PRIVATE).run {
             hohaba = (getString("height", "170")?.toDouble() ?: 0.0 * 0.45)
             weight = getString("weight", "60")?.toDouble() ?: 0.0
@@ -165,19 +168,6 @@ class MainActivity : AppCompatActivity(), CoroutineScope, ToolsFragment.FinishBt
         setHeader(navView)
         navView.setCheckedItem(R.id.nav_calendar)
         action(Calendar())
-        prefs.run {
-
-            if (day == time){
-                viewModel.insert(StepEntity(time,stepcount))
-            }
-//            day = getLong("calendar", time(currentTimeMillis).toLong())
-//                Date(
-//                    getLong(
-//                        "calendar", System.currentTimeMillis().also {
-//                            viewModel.insert(StepEntity(it, 0))
-//                        })
-//                ).let { time(it).toInt() }
-        }
     }
 
     override fun onSupportNavigateUp(): Boolean =
@@ -293,10 +283,7 @@ class MainActivity : AppCompatActivity(), CoroutineScope, ToolsFragment.FinishBt
         }
     }
 
-    private fun calgary() = (stepcount.let { 1.05 * (3 * hohaba * it) * weight } / 200000).toInt()
-
-    override val coroutineContext: CoroutineContext
-        get() = Job()
+    private fun calgary(): Int = (stepService.step.let { 1.05 * (3 * hohaba * it) * weight } / 200000).toInt()
 
     override fun onClick() {
         toolbar.title = getString(R.string.calendar)
@@ -304,7 +291,6 @@ class MainActivity : AppCompatActivity(), CoroutineScope, ToolsFragment.FinishBt
         action(Calendar())
     }
 
-    override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {}
 
     override fun onStart() {
         navView.getHeaderView(0).run {
@@ -314,40 +300,58 @@ class MainActivity : AppCompatActivity(), CoroutineScope, ToolsFragment.FinishBt
         super.onStart()
     }
 
-    //    歩数をあれするやつ
-    override fun onSensorChanged(event: SensorEvent) {
-        when (event.sensor.type) {
-            Sensor.TYPE_STEP_COUNTER -> {
-                stepcount++
-                when (val gap = event.values[0].toInt() - sensorcount) {
-                    0 -> sensorcount = event.values[0].toInt()
-                    else -> stepcount + gap
-                }
+    private val connectBind = object : ServiceConnection {
+        override fun onServiceDisconnected(name: ComponentName?) {
+            bound = false
+        }
+
+        override fun onServiceConnected(name: ComponentName?, iBinder: IBinder?) {
+            if (iBinder is StepService.StepBindar) {
+                bound = true
+                stepService = iBinder.getBindar()
             }
         }
-        navView.getHeaderView(0).barn.text = getString(R.string.barnText,calgary().toString())
+
     }
+    //    歩数をあれするやつ
+//    override fun onSensorChanged(event: SensorEvent) {
+//        when (event.sensor.type) {
+//            Sensor.TYPE_STEP_COUNTER -> {
+//                stepcount++
+//
+//                val gap = event.values[0].toInt() - sensorcount
+//
+//                if (gap <= 0){
+//                    stepcount += gap
+//                }
+//
+//                sensorcount = event.values[0].toInt()
+//            }
+//        }
+//        navView.getHeaderView(0).barn.text = getString(R.string.barnText, calgary().toString())
+//    }
 
     override fun onResume() {
         super.onResume()
-        mSensorManager
-            ?.registerListener(this, mStepCounterSensor, SensorManager.SENSOR_DELAY_NORMAL)
+//        mSensorManager
+//            ?.registerListener(this, mStepCounterSensor, SensorManager.SENSOR_DELAY_NORMAL)
     }
 
     //    歩数の保存するやつ
     override fun onStop() {
         super.onStop()
-        mSensorManager?.unregisterListener(this, mStepCounterSensor)
-        viewModel.updateOrinsert(StepEntity(day.toLong(), stepcount))
         prefs.edit().run {
-
-            if (day.toInt() == time.toInt()) putInt("walk", stepcount) else clear()
-
+            //            if (day.toInt() == time.toInt()) {
+//                putInt("walk", stepcount)
+//            } else {
+//                clear().apply()
+//            }
             putInt("sensor", sensorcount)
-            putLong("calendar",day)
+            putLong("calendar", day)
             apply()
         }
     }
+//    val data: Long = java.util.Calendar.getInstance().time
 }
 
 //キーボードが消えるやつ
@@ -359,12 +363,5 @@ fun hideKeyboard(activity: Activity) {
         manager.hideSoftInputFromWindow(view.windowToken, 0)
     }
 }
-
-val currentTimeMillis = Date(System.currentTimeMillis())
-val time: Long =
-    SimpleDateFormat("yyyyMMdd", Locale.US).run { format(currentTimeMillis) }.toLong()
-fun today(date: Date): String =
-    SimpleDateFormat("yyyy年MM月dd日", Locale.US).run { format(date) }
-
-fun String.toDailyClass() = Gson().fromJson(this, DayilyEventController::class.java)
-fun DayilyEventController.toJson() = Gson().toJson(this)
+//val currentTimeMillis = Date(System.currentTimeMillis())
+//val time: Long =SimpleDateFormat("yyyyMMdd", Locale.US).run { format(currentTimeMillis) }.toLong(

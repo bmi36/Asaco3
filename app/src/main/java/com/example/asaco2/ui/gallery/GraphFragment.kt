@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.example.asaco2.R
+import com.example.asaco2.StepEntity
 import com.github.mikephil.charting.data.BarData
 import com.github.mikephil.charting.data.BarDataSet
 import com.github.mikephil.charting.data.BarEntry
@@ -18,8 +19,7 @@ import kotlin.collections.ArrayList
 import kotlin.coroutines.CoroutineContext
 
 class GraphFragment(
-    private val list: Array<Float>?, private val size: Int, val search: Date
-) : Fragment(), CoroutineScope {
+    private val list: Array<StepEntity>, private val size: Int) : Fragment(), CoroutineScope {
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -50,22 +50,20 @@ class GraphFragment(
         chart.animateY(1000)
     }
 
-//    private var word = search.split("/").last().toInt()
-
     private val calendar = Calendar.getInstance()
 
     //    表示するやつを作るやつ
     private fun action() {
 
-        list?.let {
+        list.let {
             if (it.isNotEmpty()) {
-                for (i in 0..it.lastIndex) { addlist(i, it[i]) }
+                for (i in 0..it.lastIndex) { addlist(i, it[i].step.toFloat()) }
             }
         }
     }
 
     fun addlist(index: Int, element: Float) {
-        calendar.time = search
+
         var strDate: String
         val unit = when (size) {
             7 -> getString(R.string.Day).also {
