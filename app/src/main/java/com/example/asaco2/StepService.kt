@@ -32,7 +32,6 @@ class StepService : Service(), SensorEventListener {
 
     override fun onSensorChanged(event: SensorEvent) {
         if (event.sensor.type == Sensor.TYPE_STEP_COUNTER ) step++
-
     }
 
     override fun onDestroy() {
